@@ -14,14 +14,16 @@ int main(int argc, char *argv[])
 {
    int serv_sock, clnt_sock;
    char message[BUF_SIZE];
-   int str_len, i;
+   int str_len, i, fd_max, fd_num;
+   fd_set reads, cpy_reads;
 
    //sockaddr_in : IPv4주소체계(AF_INET)에 사용하는 구조체
    //sockaddr_in6 : IPv6주소체계(AF_INET6)에 사용하는 구조체
    struct sockaddr_in serv_adr, clnt_adr;
+   struct timeval timeout;
    socklen_t clnt_adr_sz;
 
-    //입력받은 포트번호가 잘못되었을 경우 오류를 출력하고 종료한다.
+    //입력받은 포트번호가 잘못되었을 경우 메뉴얼을 출력하고 종료.
    if(argc != 2)
    {
       printf("Usage : %s <port>\n", argv[0]);
@@ -67,6 +69,23 @@ int main(int argc, char *argv[])
 
    clnt_adr_sz = sizeof(clnt_adr);
 
+   FD_ZERO(&reads);
+
+   //데이터의 수신여부를 관찰하는 관찰대상에 서버 소켓 포함
+   FD_SET(serv_sock, &reads);
+
+   fd_max = serv_sock;
+
+   while(1) {
+      cpy_reads = reads;
+      timeout.tv_sec = 5;
+      timeout.tv_usec = 5000;
+
+      if((fd_num = select(fd_max + 1, &cpy_reads, 0, 0, &timeout)) == -1)
+         break;
+      
+   }
+
    /*
    for(i = 0; i < 5; i++)
    {
@@ -88,7 +107,7 @@ int main(int argc, char *argv[])
       close(clnt_sock);
    }
    */
-  
+
    close(serv_sock);
    return 0;
 }

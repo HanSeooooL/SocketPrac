@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
    int str_len;
    struct sockaddr_in serv_adr;
 
+   //입력받은 IP와 port가 잘못되었을때, 메뉴얼 출력 후 종료.
    if(argc != 3)
    {
       printf("Usage : %s <IP> <port> \n", argv[0]);
