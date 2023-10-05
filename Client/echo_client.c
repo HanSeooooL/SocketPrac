@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
    //s_addr: 호스트 IP주소
    //htonl == host to network long
    //Host-Byte-Order(Little Endian)로부터 NetworkByteorder 반환
-   //해외여행할 때 파파고로 한국어를 외국어로 변환시키는 것과 비슷한 원리
+   //해외여행할 때 한국어를 외국어로 번역시키려고 파파고를 키는 것 비슷한 원리
    //argv[1] 인자로 입력받은 주소.
    serv_adr.sin_addr.s_addr = inet_addr(argv[1]);
 

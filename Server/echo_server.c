@@ -8,6 +8,7 @@
 
 #define BUF_SIZE 1024   //버퍼 사이즈
 void error_handling(char *message); //오류 출력
+void savethedata(char *str);
 
 int main(int argc, char *argv[])
 {
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
    //s_addr: 호스트 IP주소
    //htonl == host to network long
    //Host-Byte-Order(Little Endian)로부터 NetworkByteorder 반환
-   //해외여행할 때 파파고로 한국어를 외국어로 변환시키는 것과 비슷한 원리
+   //해외여행할 때 한국어를 외국어로 번역시키려고 파파고를 키는 것 비슷한 원리
    //INADDR_ANY == 컴퓨터에 지정된 어느 아이피에서 오는 데이터든 다 받는다.
    //INADDR_ANY자리에 내 컴퓨터에 할당된 IP를 입력해도 가능
    serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
 
    clnt_adr_sz = sizeof(clnt_adr);
 
+   /*
    for(i = 0; i < 5; i++)
    {
       //accept함수로 클라이언트의 접속 요청 허락, 커널이 소켓 생성(클라이언트 소켓 생성)
@@ -76,12 +78,17 @@ int main(int argc, char *argv[])
          printf("Connected client %d \n", i + 1);
       //read(읽어들이는 위치(클라이언트 소켓)), 저장 위치, 버퍼 사이즈)
       //데이터의 길이를 반환
-      while((str_len = read(clnt_sock, message, BUF_SIZE)) != 0)
+      while((str_len = read(clnt_sock, message, BUF_SIZE)) != 0) {
          //write(전송위치(디스크립터), 전송내용, 길이);
          write(clnt_sock, message, str_len);
+         message[str_len] = '\0';
+         savethedata(message);
+      }
 
       close(clnt_sock);
    }
+   */
+  
    close(serv_sock);
    return 0;
 }
@@ -91,4 +98,16 @@ void error_handling(char *message)
    fputs(message, stderr);
    fputc('\n', stderr);
    exit(1);
+}
+
+void savethedata(char *str) {
+   FILE* file;
+   if (access("test.txt", 0) != -1) {  //이미 존재하는 파일인 경우 내용 추가
+        file = fopen("test.txt", "a");
+    }
+    else    //없는 경우 생성
+        file = fopen("test.txt", "w");
+   fprintf(file, "%s", str);
+
+   fclose(file);
 }

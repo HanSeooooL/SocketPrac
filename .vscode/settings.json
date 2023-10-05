@@ -3,5 +3,6 @@
         "socket.h": "c",
         "unistd.h": "c",
         "stdio.h": "c"
-    }
+    },
+    "cmake.configureOnOpen": false
 }
