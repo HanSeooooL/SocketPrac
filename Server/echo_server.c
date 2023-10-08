@@ -7,11 +7,12 @@
 #include <sys/socket.h>
 
 #define BUF_SIZE 1024   //버퍼 사이즈
+#define MAX_CHAR_PER_LINE 1024
 void error_handling(char *message); //오류 출력
 void requestsavethedata(char* message); //데이터 저장 요청
 void requestchangethedata(char* message); //데이터 수정 요청
 void requestdeletethedata(char* message); //데이터 삭제 요청
-void requestgivethedata(char* message); //데이터 리스트 요청
+void requestgivethedata(char* message, int* clnt_sock); //데이터 리스트 요청
 
 char* substring(char *str, int start, int length); //문자열 부분 자르기(자를 문자열, 시작지점, 길이)
 int Stringtoint(char *str);   //문자열 정수형 변환
@@ -125,7 +126,7 @@ int main(int argc, char *argv[])
                   }
 
                   else if(message[0] == '3') {
-                     requestgivethedata(message);
+                     requestgivethedata(message, &clnt_sock);
                   }
 
                   else write(clnt_sock, "Sign Error!\n", 12);
@@ -191,8 +192,24 @@ void requestdeletethedata(char* message) {
    
 }
 
-void requestgivethedata(char* message) {
+void requestgivethedata(char* message, int* clnt_sock) {
+   FILE *fp;
+   char buf[BUF_SIZE];
+   int file_read_len, chk_write;
+   fp = fopen("test.txt", "r");
+   while(1) {
+      memset(buf, 0x00, BUF_SIZE);
+      file_read_len = read(fp, buf, BUF_SIZE);
+      printf("\nread: %s", buf);
+      chk_write = write(*clnt_sock, buf, BUF_SIZE);
+      if(file_read_len == EOF | file_read_len == 0) {
+         printf("finish file\n");
+         break;
+      }
+   }
    
+
+   fclose(fp);
 }
 
 char* substring(char *str, int start, int length) {
