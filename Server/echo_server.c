@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define BUF_SIZE 1024   //버퍼 사이즈
 #define MAX_CHAR_PER_LINE 1024
@@ -193,13 +196,13 @@ void requestdeletethedata(char* message) {
 }
 
 void requestgivethedata(char* message, int* clnt_sock) {
-   FILE *fp;
+   int fd;
    char buf[BUF_SIZE];
    int file_read_len, chk_write;
-   fp = fopen("test.txt", "r");
+   fd = open("test.txt", O_RDONLY);
    while(1) {
       memset(buf, 0x00, BUF_SIZE);
-      file_read_len = read(fp, buf, BUF_SIZE);
+      file_read_len = read(fd, buf, BUF_SIZE);
       printf("\nread: %s", buf);
       chk_write = write(*clnt_sock, buf, BUF_SIZE);
       if(file_read_len == EOF | file_read_len == 0) {
@@ -207,9 +210,6 @@ void requestgivethedata(char* message, int* clnt_sock) {
          break;
       }
    }
-   
-
-   fclose(fp);
 }
 
 char* substring(char *str, int start, int length) {
