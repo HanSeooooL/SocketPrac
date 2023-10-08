@@ -83,6 +83,31 @@ int main(int argc, char *argv[])
 
       if((fd_num = select(fd_max + 1, &cpy_reads, 0, 0, &timeout)) == -1)
          break;
+
+      if(fd_num == 0) continue;
+
+      for(i = 0; i < fd_max + 1; i++) {
+         if(FD_ISSET(i, &cpy_reads)) {
+            if(i == serv_sock) {
+               clnt_adr_sz = sizeof(clnt_adr);
+               clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
+               FD_SET(clnt_sock, &reads);
+               if(fd_max < clnt_sock) fd_max = clnt_sock;
+               printf("connected client: %d \n", clnt_sock);
+            }
+            else {
+               str_len = read(i, message, BUF_SIZE);
+               if(str_len == 0) {
+                  FD_CLR(i, &reads);
+                  close(i);
+                  printf("closed client: %d \n", i);
+               }
+               else {
+                  write(i, message, str_len);
+               }
+            }
+         }
+      }
       
    }
 
