@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
    fd_max = serv_sock;
 
    while(1) {
+      
       cpy_reads = reads;
       timeout.tv_sec = 5;
       timeout.tv_usec = 5000;
@@ -210,6 +211,7 @@ void requestgivethedata(char* message, int* clnt_sock) {
          break;
       }
    }
+   close(fd);
 }
 
 char* substring(char *str, int start, int length) {

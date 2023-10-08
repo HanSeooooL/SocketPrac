@@ -5,14 +5,15 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <fcntl.h>
 
 #define BUF_SIZE 1024   //버퍼사이즈
 void error_handling(char *message); //오류 출력
 
 int main(int argc, char *argv[])
 {
-   int sock;
-   char message[BUF_SIZE];
+   int sock, choice;
+   char message[BUF_SIZE], keyboardinput[BUF_SIZE - 1];
    int str_len;
    struct sockaddr_in serv_adr;
 
@@ -54,21 +55,52 @@ int main(int argc, char *argv[])
 
    while(1)
    {
-      fputs("Input message(Q to quit) : ", stdout);
-      fgets(message, BUF_SIZE, stdin);
+      printf("데이터 저장 1 데이터 변경 2 데이터 삭제 2 데이터 가져오기 4 나가기 5>>");
+      scanf("%d", &choice);
+      if(choice == 5) break;
+      memset(message, 0x00, BUF_SIZE);
+      if(choice == 1) {
+         fputs("Input message(Q to quit) : ", stdout);
+         rewind(stdin);
+         fgets(keyboardinput, BUF_SIZE, stdin);
+         message[0] = '0';
+         message[1] = '\0';
+         //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
+         strcat(message, keyboardinput);
+         write(sock, message, strlen(message));
+         //read(읽어들이는위치, 저장위치, 길이);
+         //전송된 내용의 크기 길이 반환
+         str_len = read(sock, message, BUF_SIZE - 1);
+         //문자열의 끝 문자 지정
+         message[str_len] = 0;
+         printf("Message form server : %s", message);
+      }
 
-      if(!strcmp(message, "q\n") || !strcmp(message, "Q\n"))
-         break;
+      else if(choice == 2) {
 
-      //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
-      write(sock, message, strlen(message));
-      //read(읽어들이는위치, 저장위치, 길이);
-      //전송된 내용의 크기 길이 반환
-      str_len = read(sock, message, BUF_SIZE - 1);
+      }
+
+      else if(choice == 3) {
+
+      }
+
+      else if(choice == 4) {
+         message[0] = '3';
+         message[1] = '\0';
+         //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
+         write(sock, message, strlen(message));
+         //read(읽어들이는위치, 저장위치, 길이);
+         //전송된 내용의 크기 길이 반환
+         str_len = read(sock, message, BUF_SIZE - 1);
+         //문자열의 끝 문자 지정
+         message[str_len] = 0;
+         printf("Message form server : %s", message);
+         //소켓 버퍼 비우는 함수 추가해야 함.
+      }
+
+      else if(choice == 5) break;
       
-      //문자열의 끝 문자 지정
-      message[str_len] = 0;
-      printf("Message form server : %s", message);
+      else printf("다시 입력해주세요.\n");
    }
 
    close(sock);
