@@ -8,7 +8,13 @@
 
 #define BUF_SIZE 1024   //버퍼 사이즈
 void error_handling(char *message); //오류 출력
-void savethedata(char *str);
+void requestsavethedata(char* message); //데이터 저장 요청
+void requestchangethedata(char* message); //데이터 수정 요청
+void requestdeletethedata(char* message); //데이터 삭제 요청
+void requestgivethedata(char* message); //데이터 리스트 요청
+
+char* substring(char *str, int start, int length); //문자열 부분 자르기(자를 문자열, 시작지점, 길이)
+int Stringtoint(char *str);   //문자열 정수형 변환
 
 int main(int argc, char *argv[])
 {
@@ -103,7 +109,26 @@ int main(int argc, char *argv[])
                   printf("closed client: %d \n", i);
                }
                else {
-                  write(i, message, str_len);
+                  if(message[0] == '0') {
+                     requestsavethedata(message);
+                     write(clnt_sock, "Save done!\n", 11);
+                  }
+                  
+                  else if(message[0] == '1') {
+                     requestchangethedata(message);
+                     write(clnt_sock, "Change done!\n", 13);
+                  }
+
+                  else if(message[0] == '2') {
+                     requestdeletethedata(message);
+                     write(clnt_sock, "Delete done!\n", 13);
+                  }
+
+                  else if(message[0] == '3') {
+                     requestgivethedata(message);
+                  }
+
+                  else write(clnt_sock, "Sign Error!\n", 12);
                }
             }
          }
@@ -144,14 +169,47 @@ void error_handling(char *message)
    exit(1);
 }
 
-void savethedata(char *str) {
+void requestsavethedata(char* message) {
    FILE* file;
+   char *str;
    if (access("test.txt", 0) != -1) {  //이미 존재하는 파일인 경우 내용 추가
         file = fopen("test.txt", "a");
     }
     else    //없는 경우 생성
         file = fopen("test.txt", "w");
+   str = substring(message, 1, strlen(message));
    fprintf(file, "%s", str);
 
    fclose(file);
+}
+
+void requestchangethedata(char* message) {
+
+}
+
+void requestdeletethedata(char* message) {
+   
+}
+
+void requestgivethedata(char* message) {
+   
+}
+
+char* substring(char *str, int start, int length) {
+    char *res;
+    res = (char*)malloc(sizeof(char) * length + 1);
+    strncpy(res, &str[start], length);
+    res[length] = '\0';
+    return res;
+}
+
+int Stringtoint(char *str) {
+    int res = 0, w = 1;
+    unsigned long length;
+    length = strlen(str);
+    for (int i = (int)length - 1; i >= 0; i--) {
+        res += (str[i] - 48) * w;
+        w *= 10;
+    }
+    return res;
 }
