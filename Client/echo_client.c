@@ -4,6 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 
@@ -16,6 +18,7 @@ int main(int argc, char *argv[])
    char message[BUF_SIZE], keyboardinput[BUF_SIZE - 1];
    int str_len;
    struct sockaddr_in serv_adr;
+   fd_set reads, cpy_reads;
 
    //입력받은 IP와 port가 잘못되었을때, 메뉴얼 출력 후 종료.
    if(argc != 3)
@@ -85,17 +88,30 @@ int main(int argc, char *argv[])
       }
 
       else if(choice == 4) {
+         FILE *receivefile;
+         int flag/*, receiveq = 0*/;
+         receivefile = fopen("clientreceive.txt", "w");
          message[0] = '3';
          message[1] = '\0';
          //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
          write(sock, message, strlen(message));
-         //read(읽어들이는위치, 저장위치, 길이);
-         //전송된 내용의 크기 길이 반환
-         str_len = read(sock, message, BUF_SIZE - 1);
-         //문자열의 끝 문자 지정
-         message[str_len] = 0;
-         printf("Message form server : %s", message);
-         //소켓 버퍼 비우는 함수 추가해야 함.
+         do {
+            if(str_len != -1) {
+               str_len = read(sock, message, BUF_SIZE);
+            }
+            while(str_len == -1) {
+               str_len = read(sock, message, BUF_SIZE);
+            }
+            /*if (receiveq == 0) {
+               flag = fctnl(sock, F_GETFL, O_NONBLOCK);
+               fctnl(sock, F_SETFL, O_NONBLOCK);
+               receiveq = 1;
+            }*/
+            printf("Message form server : %s", message);
+            fwrite(message, sizeof(char), str_len, receivefile);
+            if(message[str_len] == EOF) break;
+         } while(str_len != -1);
+         fclose(receivefile);
       }
 
       else if(choice == 5) break;

@@ -200,6 +200,7 @@ void requestgivethedata(char* message, int* clnt_sock) {
    int fd;
    char buf[BUF_SIZE];
    int file_read_len, chk_write;
+   
    fd = open("test.txt", O_RDONLY);
    while(1) {
       memset(buf, 0x00, BUF_SIZE);
@@ -207,12 +208,15 @@ void requestgivethedata(char* message, int* clnt_sock) {
       printf("\nread: %s", buf);
       chk_write = write(*clnt_sock, buf, BUF_SIZE);
       if(file_read_len == EOF | file_read_len == 0) {
+         //chk_write = write(*clnt_sock, "+", BUF_SIZE);
          printf("finish file\n");
          break;
       }
    }
    close(fd);
 }
+
+
 
 char* substring(char *str, int start, int length) {
     char *res;
