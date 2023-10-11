@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/select.h>
 #include <fcntl.h>
 
 #define BUF_SIZE 1024   //버퍼사이즈
@@ -16,7 +18,8 @@ int main(int argc, char *argv[])
 {
    int sock, choice;
    char message[BUF_SIZE], keyboardinput[BUF_SIZE - 1];
-   int str_len;
+   int str_len, fd_max, fd_num;
+   struct timeval timeout;
    struct sockaddr_in serv_adr;
    fd_set reads, cpy_reads;
 
@@ -56,8 +59,17 @@ int main(int argc, char *argv[])
   else
       puts("Connect........");
 
+   FD_ZERO(&reads);
+   FD_SET(0, &reads);
+   FD_SET(sock, &reads);
+
+   fd_max = sock;
+
    while(1)
    {
+      cpy_reads = reads;
+      timeout.tv_sec = 5;
+      timeout.tv_usec = 0;
       printf("데이터 저장 1 데이터 변경 2 데이터 삭제 2 데이터 가져오기 4 나가기 5>>");
       scanf("%d", &choice);
       if(choice == 5) break;
@@ -95,11 +107,19 @@ int main(int argc, char *argv[])
          message[1] = '\0';
          //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
          write(sock, message, strlen(message));
-         do {
-            if(str_len != -1) {
-               str_len = read(sock, message, BUF_SIZE);
+         while(1) {
+            fd_num = select(fd_max+1, &cpy_reads, 0, 0, &timeout);
+
+            if(fd_num == -1) {
+               perror("data read loutin error!!");
             }
-            while(str_len == -1) {
+            
+            else if(fd_num == 0) {
+               printf("Time-out\n");
+               break;
+            }
+
+            else if (FD_ISSET(sock, &reads)) {
                str_len = read(sock, message, BUF_SIZE);
             }
             /*if (receiveq == 0) {
@@ -110,7 +130,7 @@ int main(int argc, char *argv[])
             printf("Message form server : %s", message);
             fwrite(message, sizeof(char), str_len, receivefile);
             if(message[str_len] == EOF) break;
-         } while(str_len != -1);
+         }
          fclose(receivefile);
       }
 
