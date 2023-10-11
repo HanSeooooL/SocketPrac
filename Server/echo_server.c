@@ -206,7 +206,7 @@ void requestgivethedata(char* message, int* clnt_sock) {
       memset(buf, 0x00, BUF_SIZE);
       file_read_len = read(fd, buf, BUF_SIZE);
       printf("\nread: %s", buf);
-      chk_write = write(*clnt_sock, buf, BUF_SIZE);
+      chk_write = write(*clnt_sock, buf, file_read_len);
       if(file_read_len == EOF | file_read_len == 0) {
          //chk_write = write(*clnt_sock, "+", BUF_SIZE);
          printf("finish file\n");

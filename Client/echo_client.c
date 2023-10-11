@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
    while(1)
    {
       cpy_reads = reads;
-      timeout.tv_sec = 5;
+      timeout.tv_sec = 3;
       timeout.tv_usec = 0;
       printf("데이터 저장 1 데이터 변경 2 데이터 삭제 2 데이터 가져오기 4 나가기 5>>");
       scanf("%d", &choice);
@@ -102,7 +102,10 @@ int main(int argc, char *argv[])
       else if(choice == 4) {
          FILE *receivefile;
          int flag/*, receiveq = 0*/;
-         receivefile = fopen("clientreceive.txt", "w");
+         if(access("clientreceive.txt", F_OK) != -1) {
+            receivefile = fopen("clientreceive.txt", "a");
+         }
+         else receivefile = fopen("clientreceive.txt", "w");
          message[0] = '3';
          message[1] = '\0';
          //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
@@ -121,16 +124,18 @@ int main(int argc, char *argv[])
 
             else if (FD_ISSET(sock, &reads)) {
                str_len = read(sock, message, BUF_SIZE);
+               printf("strlen : %d\n", str_len);
             }
             /*if (receiveq == 0) {
                flag = fctnl(sock, F_GETFL, O_NONBLOCK);
                fctnl(sock, F_SETFL, O_NONBLOCK);
                receiveq = 1;
             }*/
+            message[str_len] = '\0';
             printf("Message form server : %s", message);
             fwrite(message, sizeof(char), str_len, receivefile);
-            if(message[str_len] == EOF) break;
          }
+         
          fclose(receivefile);
       }
 
