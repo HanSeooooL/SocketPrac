@@ -7,6 +7,7 @@
 #include <string.h>
 
 #define FAIL -1
+#define BUF_SIZE 1024   //버퍼 사이즈
 
 #define CARNUMBERSIZE 11        //차량번호크기
 #define PHONENUMBERSIZE 14      //전화번호크기
