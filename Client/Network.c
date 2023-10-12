@@ -75,8 +75,9 @@ void requestsavethedata() {
 }
 
 Parkcar* requestgivemethecarList(int page) {
-    int str_len;
+    int str_len, data_count;
     char data[BUF_SIZE];
+    Parkcar* res;
 
     data[0] = '3';
     data[1] = (page / 10) + 48;
@@ -84,7 +85,13 @@ Parkcar* requestgivemethecarList(int page) {
     write(sock, data, strlen(data));
     memset(data, 0x00, BUF_SIZE);
     str_len = read(sock, data, BUF_SIZE);
-    for(int i = 1; i <= PAGEDATACOUNT && i * 32 <= str_len; i++) {
-        
+    data_count = str_len / 32;
+    res = (Parkcar*)malloc(sizeof(Parkcar) * data_count);
+    for(int i = 0; i < data_count; i++) {
+        *(res + i) -> carnumber = substring(data, ((i - 1) * 32) + i, CARNUMBERSIZE - 1);
+        *(res + i) -> phonenumber = substring(data, ((i - 1) * 32) + i + (CARNUMBERSIZE - 1), PHONENUMBERSIZE);
+        *(res + i) -> intime = substring(data, ((i - 1) * 32) + i + (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), PHONENUMBERSIZE);
     }
+
+    return res;
 }
