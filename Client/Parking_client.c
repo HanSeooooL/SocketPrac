@@ -1,7 +1,5 @@
 // echo_client.c
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "Parking_client.h"
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/types.h>

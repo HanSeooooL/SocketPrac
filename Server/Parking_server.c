@@ -1,7 +1,5 @@
 //TCP방식 소켓통신
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "Parking_server.h"
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -12,7 +10,7 @@
 #define BUF_SIZE 1024   //버퍼 사이즈
 #define MAX_CHAR_PER_LINE 1024
 void error_handling(char *message); //오류 출력
-void requestsavethedata(char* message); //데이터 저장 요청
+void requestsavetheCardata(char* message); //데이터 저장 요청
 void requestchangethedata(int *clnt_sock, char* message); //데이터 수정 요청
 void requestdeletethedata(char* message); //데이터 삭제 요청
 void requestgivethedata(char* message, int* clnt_sock); //데이터 리스트 요청
