@@ -13,7 +13,7 @@
 #define MAX_CHAR_PER_LINE 1024
 void error_handling(char *message); //오류 출력
 void requestsavethedata(char* message); //데이터 저장 요청
-void requestchangethedata(char* message); //데이터 수정 요청
+void requestchangethedata(int *clnt_sock, char* message); //데이터 수정 요청
 void requestdeletethedata(char* message); //데이터 삭제 요청
 void requestgivethedata(char* message, int* clnt_sock); //데이터 리스트 요청
 
@@ -115,12 +115,12 @@ int main(int argc, char *argv[])
                }
                else {
                   if(message[0] == '0') {
-                     requestsavethedata(message);
+                     requestsavetheCardata(message);
                      write(clnt_sock, "Save done!\n", 11);
                   }
                   
                   else if(message[0] == '1') {
-                     requestchangethedata(message);
+                     requestchangethedata(&clnt_sock, message);
                      write(clnt_sock, "Change done!\n", 13);
                   }
 
@@ -174,21 +174,33 @@ void error_handling(char *message)
    exit(1);
 }
 
-void requestsavethedata(char* message) {
+void requestsavetheCardata(char* message) {
    FILE* file;
    char *str;
-   if (access("test.txt", 0) != -1) {  //이미 존재하는 파일인 경우 내용 추가
-        file = fopen("test.txt", "a");
+   if (access("Cars.txt", 0) != -1) {  //이미 존재하는 파일인 경우 내용 추가
+        file = fopen("Cars.txt", "a");
     }
     else    //없는 경우 생성
-        file = fopen("test.txt", "w");
+        file = fopen("Cars.txt", "w");
    str = substring(message, 1, strlen(message));
    fprintf(file, "%s", str);
+   
 
    fclose(file);
 }
 
-void requestchangethedata(char* message) {
+void requestchangethedata(int *clnt_sock, char* message) {
+   FILE* fp;
+   char str[BUF_SIZE];
+   if (access("Cars.txt", 0) != -1) {  //이미 존재하는 파일인 경우 내용 추가
+        fp = fopen("Cars.txt", "r+");
+    }
+    else {
+      error_handling("File not exist!!");
+    }
+    while(fgets(str, BUF_SIZE, fp)) {
+      
+    }
 
 }
 

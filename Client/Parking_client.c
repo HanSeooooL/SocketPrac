@@ -70,11 +70,12 @@ int main(int argc, char *argv[])
       cpy_reads = reads;
       timeout.tv_sec = 3;
       timeout.tv_usec = 0;
-      printf("데이터 저장 1 데이터 변경 2 데이터 삭제 2 데이터 가져오기 4 나가기 5>>");
+      printf("주차차량 저장 1 데이터 변경 2 데이터 삭제 3 데이터 가져오기 4 나가기 5>>");
       scanf("%d", &choice);
       if(choice == 5) break;
       memset(message, 0x00, BUF_SIZE);
       if(choice == 1) {
+         memset(message, 0x00, BUF_SIZE);
          fputs("Input message(Q to quit) : ", stdout);
          rewind(stdin);
          fgets(keyboardinput, BUF_SIZE, stdin);
@@ -92,14 +93,21 @@ int main(int argc, char *argv[])
       }
 
       else if(choice == 2) {
-
+         memset(message, 0x00, BUF_SIZE);
+         int count;
+         fputs("몇번째 데이터를 지우시겠습니까? : ", stdout);
+         rewind(stdin);
+         scanf("%d", &count);
+         rewind(stdin);
+         
       }
 
       else if(choice == 3) {
-
+         
       }
 
       else if(choice == 4) {
+         memset(message, 0x00, BUF_SIZE);
          FILE *receivefile;
          int flag/*, receiveq = 0*/;
          if(access("clientreceive.txt", F_OK) != -1) {
