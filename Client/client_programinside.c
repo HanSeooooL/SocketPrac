@@ -18,3 +18,5 @@ char* substring(char *str, int start, int length) {
     res[length] = '\0';
     return res;
 }
+
+//차량 조회에 대해 리스트 자료구조를 구성해서 페이지마다 10개씩 꽂아넣자

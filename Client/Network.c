@@ -10,7 +10,6 @@
 
 #define Port 1208
 #define MYIP "127.0.0.1"
-#define PAGEDATACOUNT 10
 
 int sock, choice;
 int fd_max, fd_num;

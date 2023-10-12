@@ -4,7 +4,8 @@
         "unistd.h": "c",
         "stdio.h": "c",
         "types.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "parking_client.h": "c"
     },
     "cmake.configureOnOpen": false
 }

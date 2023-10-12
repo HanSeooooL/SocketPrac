@@ -8,6 +8,7 @@
 
 #define FAIL -1
 #define BUF_SIZE 1024   //버퍼 사이즈
+#define PAGEDATACOUNT 10 //페이지당 차량 개수
 
 #define CARNUMBERSIZE 11        //차량번호크기
 #define PHONENUMBERSIZE 14      //전화번호크기
