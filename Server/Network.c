@@ -8,6 +8,7 @@
 #include <pthread.h>
 
 #define Port 1208
+#define PAGEDATACOUNT 10
 
 int serv_sock, clnt_sock;
 int str_len, i, fd_max, fd_num;
@@ -105,7 +106,7 @@ void ListenFromtheClient() {
                   }
 
                   else if(message[0] == '3') {
-                     requestgivethedata(message, &clnt_sock);
+                     requestgivethedata(message);
                   }
 
                   else write(clnt_sock, "Sign Error!\n", 12);

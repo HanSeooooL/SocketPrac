@@ -1,6 +1,8 @@
 #include "Parking_server.h"
 #include <time.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 extern void savethecar(Parkcar newone);
@@ -17,6 +19,13 @@ char* substring(char *str, int start, int length); //문자열 부분 자르기(
 int checkMaxDayofMonth(int year, int month); //특정 년월의 일수 체크
 int checkParkingdays(char *starttime);    //주차기간 체크
 int checkBill(Parkcar selected); //요금 체크
+
+void error_handling(char *message)
+{
+   fputs(message, stderr);
+   fputc('\n', stderr);
+   exit(1);
+}
 
 
 void Carin(Parkcar newone) {    //작동
@@ -181,6 +190,25 @@ int checkMaxDayofMonth(int year, int month) {
     return res;
 }
 
+int Stringtoint(char *str) {
+    int res = 0, w = 1;
+    unsigned long length;
+    length = strlen(str);
+    for (int i = (int)length - 1; i >= 0; i--) {
+        res += (str[i] - 48) * w;
+        w *= 10;
+    }
+    return res;
+}
+
+char* substring(char *str, int start, int length) {
+    char *res;
+    res = (char*)malloc(sizeof(char) * length + 1);
+    strncpy(res, &str[start], length);
+    res[length] = '\0';
+    return res;
+}
+
 void requestsavetheCardata(char* message) {
    FILE* file;
    char *str;
@@ -215,7 +243,7 @@ void requestdeletethedata(char* message) {
    
 }
 
-void requestgivethedata(char* message) {
+void requestgivethedata(char* message, int page) {
    int fd;
    char buf[BUF_SIZE];
    int file_read_len, chk_write;

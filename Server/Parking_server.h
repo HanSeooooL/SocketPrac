@@ -19,12 +19,7 @@
 #define MININTIME 8             //시간 데이터에서의 분 위치
 #define TIMESECTORLEN 2         //시간 데이터에서의 각 구간 길이
 
-void error_handling(char *message)
-{
-   fputs(message, stderr);
-   fputc('\n', stderr);
-   exit(1);
-}
+void error_handling(char *message);
 
 typedef struct _parkcar {
     char carnumber[CARNUMBERSIZE];  //차량번호
@@ -35,7 +30,7 @@ typedef struct _parkcar {
 void requestsavetheCardata(char* message);
 void requestchangethedata(int *clnt_sock, char* message);
 void requestdeletethedata(char* message);
-void requestgivethedata(char* message, int* clnt_sock);
+void requestgivethedata(char* message);
 
 //Network
 void init_socket(); //소켓 초기화

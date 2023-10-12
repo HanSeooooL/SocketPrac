@@ -26,4 +26,7 @@ typedef struct _parkcar {
     char intime[INTIMESIZE];        //입차시간
 } Parkcar;
 
+int Stringtoint(char *str);
+char* substring(char *str, int start, int length);
+
 #endif

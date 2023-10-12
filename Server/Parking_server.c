@@ -16,7 +16,8 @@ int Stringtoint(char *str);   //문자열 정수형 변환
 
 int main(int argc, char *argv[])
 {
-   
+   init_socket();
+   ListenFromtheClient();
 
 
    /*
