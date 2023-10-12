@@ -1,0 +1,4 @@
+Client/*.o
+Server/*.o
+Compile
+Parking_*
