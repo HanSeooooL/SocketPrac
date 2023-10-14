@@ -28,10 +28,12 @@ typedef struct _parkcar {
     char intime[INTIMESIZE];        //입차시간
 } Parkcar;
 
+int Stringtoint(char *str);
+char* substring(char *str, int start, int length);
 void requestsavetheCardata(char* message);
 void requestchangethedata(int *clnt_sock, char* message);
 void requestdeletethedata(char* message);
-void requestgivethedata(char* message);
+void requestgivethedata(char* message, int page);
 
 //Network
 void init_socket(); //소켓 초기화

@@ -88,9 +88,9 @@ Parkcar* requestgivemethecarList(int page) {
     data_count = str_len / 32;
     res = (Parkcar*)malloc(sizeof(Parkcar) * data_count);
     for(int i = 0; i < data_count; i++) {
-        *(res + i) -> carnumber = substring(data, ((i - 1) * 32) + i, CARNUMBERSIZE - 1);
-        *(res + i) -> phonenumber = substring(data, ((i - 1) * 32) + i + (CARNUMBERSIZE - 1), PHONENUMBERSIZE);
-        *(res + i) -> intime = substring(data, ((i - 1) * 32) + i + (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), PHONENUMBERSIZE);
+        *(res + i) -> carnumber = *substring(data, ((i - 1) * 32) + i, CARNUMBERSIZE - 1);
+        *(res + i) -> phonenumber = *substring(data, ((i - 1) * 32) + i + (CARNUMBERSIZE - 1), PHONENUMBERSIZE);
+        *(res + i) -> intime = *substring(data, ((i - 1) * 32) + i + (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), PHONENUMBERSIZE);
     }
 
     return res;

@@ -10,7 +10,6 @@
 #include <fcntl.h>
 
 #define BUF_SIZE 1024   //버퍼사이즈
-void error_handling(char *message); //오류 출력
 
 int main(int argc, char *argv[])
 {
@@ -70,27 +69,9 @@ int main(int argc, char *argv[])
       timeout.tv_usec = 0;
       printf("주차차량 저장 1 데이터 변경 2 데이터 삭제 3 데이터 가져오기 4 나가기 5>>");
       scanf("%d", &choice);
-      if(choice == 5) break;
       memset(message, 0x00, BUF_SIZE);
-      if(choice == 1) {
-         memset(message, 0x00, BUF_SIZE);
-         fputs("Input message(Q to quit) : ", stdout);
-         rewind(stdin);
-         fgets(keyboardinput, BUF_SIZE, stdin);
-         message[0] = '0';
-         message[1] = '\0';
-         //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
-         strcat(message, keyboardinput);
-         write(sock, message, strlen(message));
-         //read(읽어들이는위치, 저장위치, 길이);
-         //전송된 내용의 크기 길이 반환
-         str_len = read(sock, message, BUF_SIZE - 1);
-         //문자열의 끝 문자 지정
-         message[str_len] = 0;
-         printf("Message form server : %s", message);
-      }
 
-      else if(choice == 2) {
+      if(choice == 2) {
          memset(message, 0x00, BUF_SIZE);
          int count;
          fputs("몇번째 데이터를 지우시겠습니까? : ", stdout);
@@ -104,47 +85,6 @@ int main(int argc, char *argv[])
          
       }
 
-      else if(choice == 4) {
-         memset(message, 0x00, BUF_SIZE);
-         FILE *receivefile;
-         int flag/*, receiveq = 0*/;
-         if(access("clientreceive.txt", F_OK) != -1) {
-            receivefile = fopen("clientreceive.txt", "a");
-         }
-         else receivefile = fopen("clientreceive.txt", "w");
-         message[0] = '3';
-         message[1] = '\0';
-         //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
-         write(sock, message, strlen(message));
-         while(1) {
-            fd_num = select(fd_max+1, &cpy_reads, 0, 0, &timeout);
-
-            if(fd_num == -1) {
-               perror("data read loutin error!!");
-            }
-            
-            else if(fd_num == 0) {
-               printf("Time-out\n");
-               break;
-            }
-
-            else if (FD_ISSET(sock, &reads)) {
-               str_len = read(sock, message, BUF_SIZE);
-               printf("strlen : %d\n", str_len);
-            }
-            /*if (receiveq == 0) {
-               flag = fctnl(sock, F_GETFL, O_NONBLOCK);
-               fctnl(sock, F_SETFL, O_NONBLOCK);
-               receiveq = 1;
-            }*/
-            message[str_len] = '\0';
-            printf("Message form server : %s", message);
-            fwrite(message, sizeof(char), str_len, receivefile);
-         }
-         
-         fclose(receivefile);
-      }
-
       else if(choice == 5) break;
       
       else printf("다시 입력해주세요.\n");
@@ -152,11 +92,4 @@ int main(int argc, char *argv[])
 
    close(sock);
    return 0;
-}
-
-void error_handling(char *message)
-{
-   fputs(message, stderr);
-   fputc('\n', stderr);
-   exit(1);
 }

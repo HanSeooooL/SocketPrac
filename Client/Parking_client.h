@@ -27,7 +27,14 @@ typedef struct _parkcar {
     char intime[INTIMESIZE];        //입차시간
 } Parkcar;
 
+void error_handling(char *message); //오류 출력
+
 int Stringtoint(char *str);
 char* substring(char *str, int start, int length);
+
+//Network
+void init_socket(); //소켓 초기화
+void requestsavethedata(); //데이터 저장 요청
+Parkcar* requestgivemethecarList(int page); //선택 페이지의 자동차 리스트 요청
 
 #endif

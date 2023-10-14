@@ -19,4 +19,11 @@ char* substring(char *str, int start, int length) {
     return res;
 }
 
+void error_handling(char *message)
+{
+   fputs(message, stderr);
+   fputc('\n', stderr);
+   exit(1);
+}
+
 //차량 조회에 대해 리스트 자료구조를 구성해서 페이지마다 10개씩 꽂아넣자

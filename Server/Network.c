@@ -106,7 +106,7 @@ void ListenFromtheClient() {
                   }
 
                   else if(message[0] == '3') {
-                     requestgivethedata(message);
+                     requestgivethedata(message, Stringtoint(substring(message, 1, 2)));
                   }
 
                   else write(clnt_sock, "Sign Error!\n", 12);
