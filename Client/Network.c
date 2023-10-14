@@ -17,6 +17,9 @@ struct timeval timeout;
 struct sockaddr_in serv_adr;
 fd_set reads, cpy_reads;
 
+Parkcar *nowparkcar;
+int page = 1;
+
 void init_socket() {
     //소켓(디스크립터) 생성
    sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -82,7 +85,26 @@ void menu_select() {
          
     }
 
-    else if(choice == 4) requestgivemethecarList(1);
+    else if(choice == 4) while(1) {
+        int choice;
+        requestgivemethecarList(page);
+        
+        printf("\n 1.다음 페이지 2.이전 페이지 3.나가기 >> ");
+        rewind(stdin);
+        scanf("%d", &choice);
+        switch(choice) {
+            case 1:
+                page += 1;
+                break;
+            case 2:
+                page -= 1;
+            case 3:
+                break;
+            default:
+                printf("다시 입력해주세요\n");
+        }
+        if(choice == 3) break;
+    }
 
     else if(choice == 5) break;
       
@@ -149,6 +171,7 @@ Parkcar* requestgivemethecarList(int page) {
         strcpy(res[i].intime, substring(data, (i * PARKCARRECORDSIZE) + (2 * i) + (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
         
     }
+    printf("\n%d Page\n", page);
     for(int i = 0; i < data_count; i++) {
         printf("%s\n", res[i].carnumber);
         printf("%s\n", res[i].phonenumber);
