@@ -34,6 +34,8 @@ char* substring(char *str, int start, int length);
 
 //Network
 void init_socket(); //소켓 초기화
+void menu_select();
+void close_socket();
 void requestsavethedata(); //데이터 저장 요청
 Parkcar* requestgivemethecarList(int page); //선택 페이지의 자동차 리스트 요청
 

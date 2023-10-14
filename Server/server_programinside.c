@@ -217,8 +217,8 @@ void requestsavetheCardata(char* message) {
     }
     else    //없는 경우 생성
         file = fopen("Cars.txt", "w");
-   str = substring(message, 1, strlen(message));
-   fprintf(file, "%s", str);
+   str = substring(message, 1, strlen(message) - 1);
+   fprintf(file, "%s\n", str);
    
 
    fclose(file);

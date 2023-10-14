@@ -8,7 +8,7 @@
 #include <sys/select.h>
 #include <fcntl.h>
 
-#define Port 1208
+#define PORT 1208
 #define MYIP "127.0.0.1"
 
 int sock, choice;
@@ -38,7 +38,7 @@ void init_socket() {
    //포트 지정
    //sin_port: port번호
    //argv[2] 인자로 입력받은 포트.
-   serv_adr.sin_port = htons(Port);
+   serv_adr.sin_port = htons(PORT);
 
    //connect(소켓 디스크립터, 주소정보 할당, addr구조체 크기)
    //지정된 주소로 접속 요청
@@ -54,17 +54,72 @@ void init_socket() {
    fd_max = sock;
 }
 
+void menu_select() {
+    char message[BUF_SIZE];
+    while(1) {
+    cpy_reads = reads;
+    timeout.tv_sec = 3;
+    timeout.tv_usec = 0;
+    printf("주차차량 저장 1 데이터 변경 2 데이터 삭제 3 데이터 가져오기 4 나가기 5>>");
+    scanf("%d", &choice);
+    memset(message, 0x00, BUF_SIZE);
+
+    if(choice == 1) {
+       requestsavethedata();
+    }
+
+    if(choice == 2) {
+        memset(message, 0x00, BUF_SIZE);
+        int count;
+        fputs("몇번째 데이터를 지우시겠습니까? : ", stdout);
+        rewind(stdin);
+        scanf("%d", &count);
+        rewind(stdin);
+         
+    }
+
+    else if(choice == 3) {
+         
+    }
+
+    else if(choice == 4) requestgivemethecarList(1);
+
+    else if(choice == 5) break;
+      
+    else printf("다시 입력해주세요.\n");
+    }
+    
+}
+
+void close_socket() {
+    close(sock);
+}
+
 void requestsavethedata() {
     int str_len;
     char data[BUF_SIZE], keyboardinput[BUF_SIZE - 1];
     memset(data, 0x00, BUF_SIZE);
-    fputs("Input message(Q to quit) : ", stdout);
-    rewind(stdin);
-    fgets(keyboardinput, BUF_SIZE - 1, stdin);
+    memset(keyboardinput, 0x00, BUF_SIZE - 1);
     data[0] = '0';
     data[1] = '\0';
+    fputs("차량번호: ", stdout);
+    rewind(stdin);
+    fgets(keyboardinput, BUF_SIZE - 1, stdin);
+    keyboardinput[strlen(keyboardinput) - 1] = '\0';
+    strcat(data ,keyboardinput);
+    memset(keyboardinput, 0x00, BUF_SIZE - 1);
+    fputs("전화번호: ", stdout);
+    rewind(stdin);
+    fgets(keyboardinput, BUF_SIZE - 1, stdin);
+    keyboardinput[strlen(keyboardinput) - 1] = '\0';
+    strcat(data ,keyboardinput);
+    memset(keyboardinput, 0x00, BUF_SIZE - 1);
+    fputs("입차시간: ", stdout);
+    rewind(stdin);
+    fgets(keyboardinput, BUF_SIZE - 1, stdin);
     //wite(전송위치(디스크립터), 전송내용, 전송내용의 길이);
-    strcat(data, keyboardinput);
+    keyboardinput[strlen(keyboardinput) - 1] = '\0';
+    strcat(data ,keyboardinput);
     write(sock, data, strlen(data));
     //read(읽어들이는위치, 저장위치, 길이);
     //전송된 내용의 크기 길이 반환

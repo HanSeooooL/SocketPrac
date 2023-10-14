@@ -7,13 +7,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#define BUF_SIZE 1024   //버퍼 사이즈
-#define MAX_CHAR_PER_LINE 1024
-void error_handling(char *message); //오류 출력
-
-char* substring(char *str, int start, int length); //문자열 부분 자르기(자를 문자열, 시작지점, 길이)
-int Stringtoint(char *str);   //문자열 정수형 변환
-
 int main(int argc, char *argv[])
 {
    init_socket();

@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 
-#define Port 1208
+#define PORT 1208
 #define PAGEDATACOUNT 10
 
 int serv_sock, clnt_sock;
@@ -41,7 +41,7 @@ void init_socket() {
     //포트 지정
     //sin_port: port번호
     //argv[2] 인자로 입력받은 포트.
-    serv_adr.sin_port = htons(Port);
+    serv_adr.sin_port = htons(PORT);
 
     //bind(소켓(디스크립터), 주소정보 할당, addr 구조체 크기)
     //bind함수를 통해 serv_adr에 입력된 소켓 주소를 serv_sock에 할당
