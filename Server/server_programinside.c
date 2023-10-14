@@ -217,7 +217,7 @@ void requestsavetheCardata(char* message) {
     }
     else    //없는 경우 생성
         file = fopen("Cars.txt", "w");
-   str = substring(message, 1, strlen(message) - 1);
+   str = substring(message, 1, strlen(message) - 2);
    fprintf(file, "%s\n", str);
    
 
@@ -248,7 +248,7 @@ void requestgivethedata(char* message, int page) {
    char buf[BUF_SIZE];
    int file_read_len, chk_write;
    
-   fd = open("test.txt", O_RDONLY);
+   fd = open("Cars.txt", O_RDONLY);
    while(1) {
       memset(buf, 0x00, BUF_SIZE);
       file_read_len = read(fd, buf, BUF_SIZE);

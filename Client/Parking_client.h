@@ -10,6 +10,8 @@
 #define BUF_SIZE 1024   //버퍼 사이즈
 #define PAGEDATACOUNT 10 //페이지당 차량 개수
 
+#define PARKCARRECORDSIZE 32    //주차차량 레코드 크기
+
 #define CARNUMBERSIZE 11        //차량번호크기
 #define PHONENUMBERSIZE 14      //전화번호크기
 #define INTIMESIZE 11           //입차시간크기

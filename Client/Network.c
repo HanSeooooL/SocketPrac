@@ -8,7 +8,7 @@
 #include <sys/select.h>
 #include <fcntl.h>
 
-#define PORT 1208
+#define PORT 1209
 #define MYIP "127.0.0.1"
 
 int sock, choice;
@@ -68,7 +68,7 @@ void menu_select() {
        requestsavethedata();
     }
 
-    if(choice == 2) {
+    else if(choice == 2) {
         memset(message, 0x00, BUF_SIZE);
         int count;
         fputs("몇번째 데이터를 지우시겠습니까? : ", stdout);
@@ -132,7 +132,7 @@ void requestsavethedata() {
 Parkcar* requestgivemethecarList(int page) {
     int str_len, data_count;
     char data[BUF_SIZE];
-    Parkcar* res;
+    Parkcar *res, newone;
 
     data[0] = '3';
     data[1] = (page / 10) + 48;
@@ -140,12 +140,19 @@ Parkcar* requestgivemethecarList(int page) {
     write(sock, data, strlen(data));
     memset(data, 0x00, BUF_SIZE);
     str_len = read(sock, data, BUF_SIZE);
-    data_count = str_len / 32;
+    data_count = str_len / (PARKCARRECORDSIZE + 2);
+    printf("%s\n", data);
     res = (Parkcar*)malloc(sizeof(Parkcar) * data_count);
     for(int i = 0; i < data_count; i++) {
-        *(res + i) -> carnumber = *substring(data, ((i - 1) * 32) + i, CARNUMBERSIZE - 1);
-        *(res + i) -> phonenumber = *substring(data, ((i - 1) * 32) + i + (CARNUMBERSIZE - 1), PHONENUMBERSIZE);
-        *(res + i) -> intime = *substring(data, ((i - 1) * 32) + i + (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), PHONENUMBERSIZE);
+        strcpy(res[i].carnumber, substring(data, (i * PARKCARRECORDSIZE) + (2 * i), CARNUMBERSIZE - 1));
+        strcpy(res[i].phonenumber, substring(data, (i * PARKCARRECORDSIZE) + (2 * i) + (CARNUMBERSIZE - 1), PHONENUMBERSIZE - 1));
+        strcpy(res[i].intime, substring(data, (i * PARKCARRECORDSIZE) + (2 * i) + (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
+        
+    }
+    for(int i = 0; i < data_count; i++) {
+        printf("%s\n", res[i].carnumber);
+        printf("%s\n", res[i].phonenumber);
+        printf("%s\n", res[i].intime);
     }
 
     return res;

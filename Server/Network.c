@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 
-#define PORT 1208
+#define PORT 1209
 #define PAGEDATACOUNT 10
 
 int serv_sock, clnt_sock;
