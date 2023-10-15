@@ -262,3 +262,17 @@ void requestgivethedata(char* message, int page) {
    }
    close(fd);
 }
+
+void server_console() {
+    int choice;
+    while(1) {
+        printf("서버를 종료하려면 0번을 입력 >> ");
+        scanf("%d", &choice);
+
+        if(choice == 0) {
+            break;
+        }
+
+        else printf("다시 입력해주세요.\n");
+    }
+}

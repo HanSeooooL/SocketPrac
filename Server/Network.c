@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <pthread.h>
+#include <signal.h>
 
 #define PORT 1209
 #define PAGEDATACOUNT 10
@@ -16,6 +16,8 @@ fd_set reads, cpy_reads;
 struct sockaddr_in serv_adr, clnt_adr;
 struct timeval timeout;
 socklen_t clnt_adr_sz;
+int fds[2];
+pid_t pid;
 
 void init_socket() {
     //소켓(디스크립터) 생성
@@ -125,3 +127,4 @@ int sendthedata(char* data, int datasize) {
     return chk_write;
     
 }
+

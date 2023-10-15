@@ -5,7 +5,9 @@
         "stdio.h": "c",
         "types.h": "c",
         "stat.h": "c",
-        "parking_client.h": "c"
+        "parking_client.h": "c",
+        "select.h": "c",
+        "time.h": "c"
     },
     "cmake.configureOnOpen": false
 }

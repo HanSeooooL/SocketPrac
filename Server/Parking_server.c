@@ -1,11 +1,5 @@
 //TCP방식 소켓통신
 #include "Parking_server.h"
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 int main(int argc, char *argv[])
 {
