@@ -31,8 +31,14 @@ typedef struct _parkcar {
 
 void error_handling(char *message); //오류 출력
 
+//programinside
 int Stringtoint(char *str);
 char* substring(char *str, int start, int length);
+int get_page();     //페이지 번호 가져오기
+void next_page();   //페이지 다음 번호로 이동
+void prev_page();   //페이지 이전 번호로 이동
+void get_pagelist(char *data, int str_len); //구조체 배열에 선택 페이지의 데이터 저장
+void print_pagelist();  //저장된 차량 데이터 출력
 
 //Network
 void init_socket(); //소켓 초기화

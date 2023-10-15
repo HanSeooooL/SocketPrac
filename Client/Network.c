@@ -17,9 +17,6 @@ struct timeval timeout;
 struct sockaddr_in serv_adr;
 fd_set reads, cpy_reads;
 
-Parkcar *nowparkcar;
-int page = 1;
-
 void init_socket() {
     //소켓(디스크립터) 생성
    sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -87,17 +84,17 @@ void menu_select() {
 
     else if(choice == 4) while(1) {
         int choice;
-        requestgivemethecarList(page);
+        requestgivemethecarList(get_page());
         
         printf("\n 1.다음 페이지 2.이전 페이지 3.나가기 >> ");
         rewind(stdin);
         scanf("%d", &choice);
         switch(choice) {
             case 1:
-                page += 1;
+                next_page();
                 break;
             case 2:
-                page -= 1;
+                prev_page();
             case 3:
                 break;
             default:
@@ -152,7 +149,7 @@ void requestsavethedata() {
 }
 
 Parkcar* requestgivemethecarList(int page) {
-    int str_len, data_count;
+    int str_len;
     char data[BUF_SIZE];
     Parkcar *res, newone;
 
@@ -162,21 +159,8 @@ Parkcar* requestgivemethecarList(int page) {
     write(sock, data, strlen(data));
     memset(data, 0x00, BUF_SIZE);
     str_len = read(sock, data, BUF_SIZE);
-    data_count = str_len / (PARKCARRECORDSIZE + 2);
-    printf("%s\n", data);
-    res = (Parkcar*)malloc(sizeof(Parkcar) * data_count);
-    for(int i = 0; i < data_count; i++) {
-        strcpy(res[i].carnumber, substring(data, (i * PARKCARRECORDSIZE) + (2 * i), CARNUMBERSIZE - 1));
-        strcpy(res[i].phonenumber, substring(data, (i * PARKCARRECORDSIZE) + (2 * i) + (CARNUMBERSIZE - 1), PHONENUMBERSIZE - 1));
-        strcpy(res[i].intime, substring(data, (i * PARKCARRECORDSIZE) + (2 * i) + (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
-        
-    }
-    printf("\n%d Page\n", page);
-    for(int i = 0; i < data_count; i++) {
-        printf("%s\n", res[i].carnumber);
-        printf("%s\n", res[i].phonenumber);
-        printf("%s\n", res[i].intime);
-    }
+    get_pagelist(data, str_len);
+    print_pagelist();
 
     return res;
 }
