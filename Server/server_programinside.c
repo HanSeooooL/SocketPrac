@@ -240,6 +240,7 @@ void requestchangethedata(int *clnt_sock, char* message) {
 }
 
 void requestdeletethedata(char* message) {
+   FILE* fp;
    
 }
 

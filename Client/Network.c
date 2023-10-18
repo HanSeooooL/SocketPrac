@@ -164,3 +164,18 @@ Parkcar* requestgivemethecarList(int page) {
 
     return res;
 }
+
+void requestDeletetheCar(int page, int count) {
+    int str_len;
+    char data[BUF_SIZE];
+
+    data[0] = '2';
+    data[1] = '\0';
+    strcat(data, Inttostring(page));
+    strcat(data, Inttostring(count));
+    write(sock, data, strlen(data));
+    memset(data, 0x00, BUF_SIZE);
+    str_len = read(sock, data, BUF_SIZE - 1);
+    data[str_len] = 0;
+    printf("Message form server : %s", data);
+}
