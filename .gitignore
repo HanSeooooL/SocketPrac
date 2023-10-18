@@ -3,3 +3,4 @@ Server/*.o
 Compile
 Parking_*
 ./Cars.txt
+./UI
