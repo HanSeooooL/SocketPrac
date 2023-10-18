@@ -7,7 +7,7 @@
         "stat.h": "c",
         "parking_client.h": "c",
         "select.h": "c",
-        "time.h": "c"
+        "time.h": "c",
     },
     "cmake.configureOnOpen": false
 }

@@ -1,6 +1,7 @@
 #include "Parking_client.h"
 
-Parkcar *nowparkcar;
+
+Parkcar *nowparkcar;    //연결리스트 시작지점
 int page = 1;
 
 void error_handling(char *message)
@@ -18,6 +19,26 @@ int Stringtoint(char *str) {
         res += (str[i] - 48) * w;
         w *= 10;
     }
+    return res;
+}
+
+char* Inttostring(int num) {
+    int i = 10, w = 1;
+    char *res;
+    while(1) {
+        if(num / i == 0) {
+            break;
+        }
+        w += 1; i *= 10;
+    }
+    res = (char*)malloc(sizeof(char) * (w + 1));
+    for(int j = 0; j < w; j++) {
+
+        if(i != 1) res[j] = ((num % i) / (i / 10)) + 48;
+        else res[j] = (num % i) + 48;
+
+    }
+    res[w] = '\0';
     return res;
 }
 

@@ -33,6 +33,7 @@ void error_handling(char *message); //오류 출력
 
 //programinside
 int Stringtoint(char *str);
+char* Inttostring(int num);
 char* substring(char *str, int start, int length);
 int get_page();     //페이지 번호 가져오기
 void next_page();   //페이지 다음 번호로 이동
