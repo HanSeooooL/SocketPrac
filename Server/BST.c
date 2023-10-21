@@ -4,7 +4,7 @@ typedef Parkcar Element;
 
 typedef struct _node {
     Element data;
-    struct _node* left, right;
+    struct _node* left, *right;
 } Node;
 
 Node *root;

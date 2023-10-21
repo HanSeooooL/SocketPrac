@@ -22,7 +22,20 @@ void *p_function(void *data) {
     }
 }
 
+int function1() {
+    int res;
+    res = 1 + 2;
+    return res;
+}
+
+int function2() {
+    int res;
+    res = 3 + 4 + 5;
+    return res;
+}
+
 int main() {
+    /*
     pthread_t pthread[2];
     int thr_id;
     int status;
@@ -53,6 +66,26 @@ int main() {
     pthread_join(pthread[0], (void **)&status);
     pthread_join(pthread[1], (void **)&status);
 
-    printf("end??\n");
+    printf("end??\n"); */
+
+    pthread_t pthread[2];
+    int result[2];
+
+    if(pthread_create(&pthread[0], NULL, function1, 0) < 0) {
+        printf("Error!!");
+        exit(1);
+    }
+    if(pthread_create(&pthread[1], NULL, function2, 0) < 0) {
+        printf("Error!!");
+        exit(1);
+    }
+
+    pthread_join(pthread[0], (void **)&result[0]);
+    pthread_join(pthread[1], (void **)&result[1]);
+    printf("result1 : %d\n", result[0]);
+    printf("result2 : %d\n", result[1]);
+
     return 0;
+
+
 }
