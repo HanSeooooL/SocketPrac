@@ -127,4 +127,3 @@ int sendthedata(char* data, int datasize) {
     return chk_write;
     
 }
-

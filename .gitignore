@@ -5,3 +5,4 @@ Parking_*
 ./Cars.txt
 *.txt
 Client/UI/
+pthreadtest/pthreadtest

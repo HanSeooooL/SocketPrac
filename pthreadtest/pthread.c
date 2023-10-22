@@ -4,7 +4,6 @@
 #include <string.h>
 #include <pthread.h>
 
-
 void *p_function(void *data) {
     pid_t pid;
     pthread_t tid;
