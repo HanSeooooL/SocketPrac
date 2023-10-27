@@ -1,18 +1,26 @@
 
 #define MAX_CHAR_PER_LINE 1024
 
-#define PARKINGCARINFOROUTE "Parkinginfo.txt"
+#define PARKINGCARINFOROUTE "parkcar.txt"
 #define COMMUTERINFOROUTE "Commuterinfo.txt"
 #define PLACEINFOROUTE "Placeinfo.txt"
+#define THREADLIMIT 100
 
 #include "Parking_server.h"
 #include <unistd.h>
+#include <pthread.h>
+#include <stdarg.h>
+
+pthread_t pthreadarr[THREADLIMIT];
+
+static pthread_mutex_t Key_parkcar;
 
 typedef Parkcar Element;
 typedef struct LinkedNode {
     Element data;
     struct LinkedNode *link;
 } Node;
+
 
 void error(char *msg)
 {
@@ -30,6 +38,16 @@ Element dequeue(void);  //데이터 가져오기(큐에서 삭제)
 Element peek(void);     //데이터 가져오기(큐에서 삭제X)
 void destroy_queue(void);   //큐 초기화
 void print_queue(char *msg);
+
+void init_thread(void* func, int num, ...) {
+    //func = 함수포인터 num = 인자 개수
+    va_list ap;
+    va_start(ap, num);
+}
+
+void init_mutex(void) {
+    pthread_mutex_init(&Key_parkcar, NULL);
+}
 
 void init_Parkingcarinfo(void) {
     FILE *fp;
