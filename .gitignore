@@ -6,3 +6,4 @@ Parking_*
 *.txt
 Client/UI/
 pthreadtest/pthreadtest
+build/
