@@ -5,14 +5,23 @@
 #include <conio.h>
 #include <stdarg.h>
 
-//ë°ì´í„° íƒ€ìž… ì½”ë“œ
-#define DT_PARKCAR 3
-
-//ë°ì´í„° íƒ€ìž… ì½”ë“œ
-#define SCREENCOLS 160
-#define SCREENLINES 40
+//UI°ü·Ã »ó¼ö
+#define SCREENCOLS 138
+#define SCREENLINES 42
 #define BUTTONHOR 26
-#define BUTTONVER 5
+#define BUTTONVER 3
+#define ELEMENTBUTTONHOR 15
+#define ELEMENTBUTTONVER 3
+#define HORIZONAL 0
+#define VERTICAL 1
+
+INPUT_RECORD rec;
+DWORD dwNOER;
+HANDLE CIN = 0;
+
+//ClickÃ¼Å©¿ë ÁÂÇ¥ ±â·Ï
+int *menux, *menuy, saved;
+int *elementx, *elementy, elementsaved;
 
 void gotoxy(int x, int y)	//gotoxy
 {
@@ -20,7 +29,7 @@ void gotoxy(int x, int y)	//gotoxy
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
-void textcolor(int color_number)	//ê¸€ìž ìƒ‰
+void textcolor(int color_number)	//±ÛÀÚ »ö
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
 }
@@ -37,15 +46,50 @@ void incursor(int n)
 	SetConsoleCursorInfo(hConsole, &ConsoleCursor);
 }
 
+void click(int *xx, int *yy, int *lr) {
+    while(1) {
+        ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER);
+        if(rec.EventType == MOUSE_EVENT) {
+            if(rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) {
+                int mouse_x = rec.Event.MouseEvent.dwMousePosition.X;
+                int mouse_y = rec.Event.MouseEvent.dwMousePosition.Y;
+                *xx = mouse_x;
+                *yy = mouse_y;
+                *lr = 1;
+
+                break;
+            }
+            else if(rec.Event.MouseEvent.dwButtonState & FROM_LEFT_2ND_BUTTON_PRESSED) {
+                int mouse_x = rec.Event.MouseEvent.dwMousePosition.X;
+                int mouse_y = rec.Event.MouseEvent.dwMousePosition.Y;
+                *xx = mouse_x;
+                *yy = mouse_y;
+                *lr = 2;
+
+                break;
+            }
+        }
+    }
+}
+
 void printText(int x, int y, char* text) {
     gotoxy(x, y);
     printf("%s", text);
 }
 
 void defaultscreensetting() {
-    system("mode con cols=160 lines=40");
-	system("ì£¼ì°¨ìž¥ ì •ì‚°ê´€ë¦¬ í”„ë¡œê·¸ëž¨");
+    system("mode con cols=138 lines=42");
+	system("ÁÖÂ÷Àå Á¤»ê°ü¸® ÇÁ·Î±×·¥");
+    SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
     incursor(0);
+}
+
+void printScreenTitle(char* title) {
+    //ÀÔ·ÂµÈ ¹®ÀÚ¿­À» È­¸éÀÇ °¡Àå À§ Á¤Áß¾Ó¿¡ Ãâ·ÂÇÏ´Â ÇÔ¼ö
+    int str_len, halfscreen;
+    str_len = strlen(title);
+    halfscreen = getCenterofhorizonal(0, SCREENCOLS, str_len);
+    printText(halfscreen, 1, title);
 }
 
 int getCenterofhorizonal(int horo, int hort, int textlen) {
@@ -58,26 +102,33 @@ int getCenterofhorizonal(int horo, int hort, int textlen) {
     return res;
 }
 
-int getCenterofVertical(int vero, int vert) {
+int getCenterofVertical(int vero, int vert, int ylen) {
     int res;
     if(vero == vert) return vero;
-    res = (vert - vero) >> 1;
-    res += vero;
+    if(ylen != 0) ylen = ylen >> 1;
+    res = ((vert - vero) >> 1) + vero;
+    res -= ylen;
+    if (res < 0) return FAIL;
     return res;
 }
 
 void printTexttoCenter(int horo, int vero, int hort, int vert, char* text) {
-    //xì¶•ê³¼ yì¶•ì„ ë°›ì•„ì„œ ì¤‘ì‹¬ì¢Œí‘œì— textì¶œë ¥
+    //xÃà°ú yÃàÀ» ¹Þ¾Æ¼­ Áß½ÉÁÂÇ¥¿¡ textÃâ·Â
     int destination, horres, verres;
     horres = getCenterofhorizonal(horo, hort, strlen(text));
-    verres = getCenterofVertical(vero, vert);
-    if(horres == FAIL) error_handling("ê³µê°„ì´ ë„ˆë¬´ ìž‘ìŠµë‹ˆë‹¤.(printTexttoCenter)");
+    verres = getCenterofVertical(vero, vert, 0);
+    if(horres == FAIL) error_handling("°ø°£ÀÌ ³Ê¹« ÀÛ½À´Ï´Ù.(printTexttoCenter)");
     printText(horres, verres, text);
 }
 
 void printDataList(int x, int y, int colgap, int rawgap, int datacount, void* data, short datatype) {
-    //x, y = ì‹œìž‘ ì¢Œí‘œ colgap = ê°€ë¡œ ê°„ê²© rawgap = ì„¸ë¡œ ê°„ê²© datacount = ë°ì´í„° ê°œìˆ˜ data = ì¶œë ¥í•  ë°ì´í„° ì£¼ì†Œ datatype = ì¶œë ¥í•  ë°ì´í„°ì˜ íƒ€ìž…
+    //x, y = ½ÃÀÛ ÁÂÇ¥ colgap = °¡·Î °£°Ý rawgap = ¼¼·Î °£°Ý datacount = µ¥ÀÌÅÍ °³¼ö data = Ãâ·ÂÇÒ µ¥ÀÌÅÍ ÁÖ¼Ò datatype = Ãâ·ÂÇÒ µ¥ÀÌÅÍÀÇ Å¸ÀÔ
     if(datatype == DT_PARKCAR) {
+        printText(x, y, "Â÷·®¹øÈ£");
+        printText(x + colgap, y, "ÀüÈ­¹øÈ£");
+        printText(x + (colgap * 2), y, "ÀÔÂ÷½Ã°¢");
+        y += rawgap;
+
         for(int i = 0; i < datacount; i++) {
             printText(x, y, ((Parkcar*)data)[i].carnumber);
             printText(x + colgap, y, ((Parkcar*)data)[i].phonenumber);
@@ -87,60 +138,99 @@ void printDataList(int x, int y, int colgap, int rawgap, int datacount, void* da
     }
 }
 
-void printScreenTitle(char* title) {
-    //ìž…ë ¥ëœ ë¬¸ìžì—´ì„ í™”ë©´ì˜ ê°€ìž¥ ìœ„ ì •ì¤‘ì•™ì— ì¶œë ¥í•˜ëŠ” í•¨ìˆ˜
-    int str_len, halfscreen;
-    str_len = strlen(title);
-    halfscreen = getCenterofhorizonal(0, SCREENCOLS, str_len);
-    printText(halfscreen, 1, title);
+void printGraph(int x, int y, int alldata, int successdata) {
+    float percentage = (float)successdata / (float)alldata;
+    int key = ((float)successdata / (float)alldata) * 100;
+    if(percentage * 100 + 5 == (key % 10) + 10) key += 10;
+    key = key % 10;
+    for(int i = 0; i < key; i++) {
+        x += i * 2;
+        printText(x, y, "?");
+    }
+    key = 10 - key;
+    for(int i = 0; i < key; i++) {
+        x += i * 2;
+        printText(x, y, "?");
+    }
 }
 
 void makeBox(int x, int y, int hor, int ver) {
-    //hor = ê°€ë¡œ ver = ì„¸ë¡œ
-    //(x, y) = ì‹œìž‘ì¢Œí‘œ(ì™¼ìª½ ê¼­ì§“ì  ì¢Œí‘œ)
-    //ìž…ë ¥ëœ ê°€ë¡œì„¸ë¡œ í¬ê¸°ì˜ ìƒìžë¥¼ ì¶œë ¥í•˜ëŠ” í•¨ìˆ˜
+    //hor = °¡·Î ver = ¼¼·Î
+    //(x, y) = ½ÃÀÛÁÂÇ¥(¿ÞÂÊ ²ÀÁþÁ¡ ÁÂÇ¥)
+    //ÀÔ·ÂµÈ °¡·Î¼¼·Î Å©±âÀÇ »óÀÚ¸¦ Ãâ·ÂÇÏ´Â ÇÔ¼ö
     for (int i = 0; i < ver; i++) {
         gotoxy(x, y);
         if(i == 0) {
-            printf("â”");
+            printf("¦®");
             for(int i = 0; i < hor - 2; i++) {
-                printf("â”");
+                printf("¦¬");
             }
-            printf("â”“");
+            printf("¦¯");
         }
         else if(i == ver - 1) {
-            printf("â”—");
+            printf("¦±");
             for(int i = 0; i < hor - 2; i++) {
-                printf("â”");
+                printf("¦¬");
             }
-            printf("â”›");  
+            printf("¦°");  
         }
         else {
-            printf("â”ƒ");
+            printf("¦­");
             gotoxy(x + hor - 1, y);
-            printf("â”ƒ");
+            printf("¦­");
         }
         y += 1;
     }
 }
 
+void makeButtonClickEvent(int x, int y) {
+    x = menux[saved];
+    y = menuy[saved];
+    saved += 1;
+}
+
+void makeElementButtonClickEvent(int x, int y) {
+    x = elementx[elementsaved];
+    y = elementy[elementsaved];
+    saved += 1;
+}
+
 void Button(int x, int y, char* name) {
     makeBox(x, y, BUTTONHOR, BUTTONVER);
     printTexttoCenter(x, y, x + BUTTONHOR, y + BUTTONVER, name);
+    makeButtonClickEvent(x, y);
+}
+
+void ElementButton(int x, int y, char* name) {
+    makeBox(x, y, ELEMENTBUTTONHOR, ELEMENTBUTTONVER);
+    printTexttoCenter(x, y, x + ELEMENTBUTTONHOR, y + ELEMENTBUTTONVER, name);
+    makeElementButtonClickEvent(x, y);
+}
+
+int checkClickEvent(int xx, int yy, int lr) {
+    for(int i = 0; i < saved; i++) {
+        if((menux[i] <= xx <= (menux[i] + BUTTONHOR)) &&
+            (menuy[i] <= yy <= (menuy[i] + BUTTONVER))) {
+                return i;
+            }
+    }
 }
 
 void Layout1(char* title) {
     system("cls");
     printScreenTitle(title);
-    makeBox(2, 4, 100, 34);
-    makeBox(106, 4, 50, 12);
-    makeBox(106, 17, 50, 21);
+    //makeBox(2, 4, 100, 34);
+    //makeBox(106, 4, 50, 12);
+    //makeBox(106, 17, 50, 21);
+    makeBox(2, 4, (((SCREENCOLS - 4) / 3) * 2) - 2, SCREENLINES - 5);
+    makeBox(2 + (((SCREENCOLS - 4) / 3) * 2) + 1, 4, (SCREENCOLS - 4) / 3 - 2, (SCREENLINES - 6) / 3 + 1);
+    makeBox(2 + (((SCREENCOLS - 4) / 3) * 2) + 1, (4 + (SCREENLINES - 6) / 3 + 1) + 1, (SCREENCOLS - 4) / 3 - 2, ((SCREENLINES - 6) / 3 * 2) - 1);
 }
 
-void Layout2(char* title) {
+void Layout2(char* title, int Boxsizex, int BoxsizeY) {
     system("cls");
     printScreenTitle(title);
-    makeBox(getCenterofhorizonal(0, SCREENCOLS, 60), 10, 60, 15);
+    makeBox(getCenterofhorizonal(0, SCREENCOLS, Boxsizex), getCenterofVertical(4, SCREENLINES, BoxsizeY), Boxsizex, BoxsizeY);
 }
 
 void Layout3(char* title) {
@@ -152,18 +242,20 @@ void Layout3(char* title) {
     makeBox(4, 5 + (SCREENLINES - 8) / 2, ((SCREENCOLS - 9) / 3), (SCREENLINES - 8) / 2);
     makeBox(4 + ((SCREENCOLS - 9) / 3) + 1, 5 + (SCREENLINES - 8) / 2, ((SCREENCOLS - 9) / 3), (SCREENLINES - 8) / 2);
     makeBox(4 + ((SCREENCOLS - 9) / 3 * 2) + 2, 5, ((SCREENCOLS - 9) / 3) - 1, SCREENLINES - 8);
+    
+    
 }
 
-void Layout4(char* title) {
+void Layout4(char* title, int leftboxx, int leftboxy, int rightboxx, int rightboxy) {
     //ppt 43
     system("cls");
     printScreenTitle(title);
-    makeBox(getCenterofhorizonal(0, SCREENCOLS, 60) - 30, 10, 60, 15);
-    makeBox(getCenterofhorizonal(0, SCREENCOLS, 60) + 30, 10, 50, 15);
+    makeBox(getCenterofhorizonal(0, SCREENCOLS, leftboxx) - (leftboxx / 2), getCenterofVertical (4, SCREENLINES, leftboxy), leftboxx, leftboxy);
+    makeBox(getCenterofhorizonal(0, SCREENCOLS, rightboxx) + (leftboxx / 2), getCenterofVertical(4, SCREENLINES, rightboxy), rightboxx, rightboxy);
 }
 
 char** makeButtonNameArray(int count, ...) {
-    //count = ë¬¸ìžì—´ ê°œìˆ˜, ê·¸ ë’¤ì— ë¬¸ìžì—´ ìž…ë ¥
+    //count = ¹®ÀÚ¿­ °³¼ö, ±× µÚ¿¡ ¹®ÀÚ¿­ ÀÔ·Â
     va_list ap;
     int i;
     char** strarr = NULL;
@@ -182,12 +274,38 @@ char** makeButtonNameArray(int count, ...) {
     
 }
 
-void Layout1_Buttons(int n, char **names) {
-    int x, y;
-    
-    for(int i; i < n; i++) {
-
+void Layout1_menuButtons(int choice, int n, char **names) {
+    int *yarr, x;
+    free(menux);
+    free(menuy);
+    saved = 0;
+    if(choice == 0) {
+        menux = (int*)malloc(sizeof(int) * n);
+        menuy = (int*)malloc(sizeof(int) * n);
     }
+  
+    else if(choice == 1) {
+        menux = (int*)malloc(sizeof(int) * (n + 1));
+        menuy = (int*)malloc(sizeof(int) * (n + 1));
+    }
+
+    yarr = (int*)malloc(sizeof(int) * (n + 1));
+    x = (((SCREENLINES - 6) / 3 * 2) - 1 - 4) / n;
+    yarr[0] = 0;
+
+    for(int i = 1 ; i < n; i ++) {
+        yarr[i] = x * i;
+    }
+    yarr[n] = ((SCREENLINES - 6) / 3 * 2) - 1 - 4;
+
+    for(int i = 0; i < n; i++) {
+        Button(getCenterofhorizonal(2 + (((SCREENCOLS - 4) / 3) * 2) + 1, 2 + (((SCREENCOLS - 4) / 3) * 2) + 1 + (SCREENCOLS - 4) / 3 - 2, BUTTONHOR),
+        getCenterofVertical(yarr[i], yarr[i + 1], 0) + (4 + (SCREENLINES - 6) / 3 + 1) + 1, names[i]);
+        
+    }
+
+    free(names);
+    free(yarr);
 }
 
 void Layout2_Buttons(int n, char **names) {
@@ -202,15 +320,11 @@ void Layout4_Buttons(int n, char **names) {
 
 }
 
-void UI_0000() {
-    Layout4("ì£¼ì°¨ ì •ì‚°ê´€ë¦¬ í”„ë¡œê·¸ëž¨");
-}
-
-void UI_0001() {
+void UI_1100() {
 
 }
 
-void UI_0002() {
+void UI_0100() {
 
 }
 
@@ -218,10 +332,48 @@ void UI_0003() {
 
 }
 
+void UI_0002() {
+
+}
+
+void UI_0001() {
+
+}
+
+void UI_0000() {
+    int xx, yy, lr, choice;
+    Parkcar *array;
+    array = (Parkcar*)malloc(sizeof(Parkcar) * 10);
+    Layout1("ÁÖÂ÷ Á¤»ê°ü¸® ÇÁ·Î±×·¥");
+    Layout1_menuButtons(1, 3, makeButtonNameArray(3, "ÀÔÂ÷", "ÁÖÂ÷Â÷·®°Ë»ö", "Á¤±â±Ç °ü¸®"));
+    readParkinginfo();
+    for(int i = 0; i < 2; i++) {
+        array[i] = dequeue();
+    }
+    printDataList(8, 6, 20, 2, 2, (void*)array, DT_PARKCAR);
+    while(1) {
+        click(&xx, &yy, &lr);
+        choice = checkClickEvent(xx, yy, lr);
+        switch(choice) {
+            case 0:
+                UI_0001();
+                break;
+            case 1:
+                UI_0002();
+                break;
+            case 2:
+                UI_0100();
+                break;
+            case 3:
+                UI_1100();
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 void ProgramStart() {
     defaultscreensetting();
     UI_0000();
-    while(1) {
-
-    }
 }
