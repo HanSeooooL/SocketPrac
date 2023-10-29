@@ -141,16 +141,16 @@ void printDataList(int x, int y, int colgap, int rawgap, int datacount, void* da
 void printGraph(int x, int y, int alldata, int successdata) {
     float percentage = (float)successdata / (float)alldata;
     int key = ((float)successdata / (float)alldata) * 100;
-    if(percentage * 100 + 5 == (key % 10) + 10) key += 10;
-    key = key % 10;
+    if(percentage * 100 + 5 >= (key / 10) * 10 + 10) key += 10;
+    key = key / 10;
     for(int i = 0; i < key; i++) {
-        x += i * 2;
-        printText(x, y, "?");
+        x += 3;
+        printText(x, y, "o");
     }
     key = 10 - key;
     for(int i = 0; i < key; i++) {
-        x += i * 2;
-        printText(x, y, "?");
+        x += 3;
+        printText(x, y, "x");
     }
 }
 
@@ -350,6 +350,7 @@ void UI_0000() {
     for(int i = 0; i < 2; i++) {
         array[i] = dequeue();
     }
+    printGraph(2 + (((SCREENCOLS - 4) / 3) * 2) + 1 + 2, 4 + (SCREENLINES - 6) / 3 + 1 - 3, 10, 2);
     printDataList(8, 6, 20, 2, 2, (void*)array, DT_PARKCAR);
     while(1) {
         click(&xx, &yy, &lr);
