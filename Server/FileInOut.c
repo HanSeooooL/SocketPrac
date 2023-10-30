@@ -7,11 +7,14 @@
 #define THREADLIMIT 100
 
 #include "Parking_server.h"
+#include "parson.h"
 #include <unistd.h>
 #include <pthread.h>
 #include <stdarg.h>
 
 pthread_t pthreadarr[THREADLIMIT];
+
+ParkingplaceSetting Setting;
 
 static pthread_mutex_t Key_parkcar;
 
@@ -210,4 +213,24 @@ void print_queue(char *msg)
     for(p = front; p != NULL; p = p -> link)
         printf("%s\n", p -> data.carnumber);
     printf("\n");
+}
+
+void getSetting() {
+    JSON_Value *rootvalue;
+    JSON_Object *rootobj;
+    
+    rootvalue = json_parse_file("setting.json");
+    rootobj = json_value_get_object(rootvalue);
+
+    Setting.MaxCarSize = json_object_get_number(rootobj, "MAXCARSIZE");
+    Setting.FirstPee = json_object_get_number(rootobj, "FIRSTPEE");
+    Setting.FirstPeeTime = json_object_get_number(rootobj, "FIRSTPEETIME");
+    Setting.NextPee = json_object_get_number(rootobj, "NEXTPEE");
+    Setting.NextPeeTime = json_object_get_number(rootobj, "NEXTPEETIME");
+    Setting.GetWeekendPee = json_object_get_number(rootobj, "GETWEEKENDPEE");
+    Setting.GetBigCarPeePercent = json_object_get_number(rootobj, "GETBIGCARPEEPERCENT");
+    Setting.ChangePlusMoney = json_object_get_number(rootobj, "CHANGEPLUSMONEY");
+    Setting.PlusMoneyTime = json_object_get_number(rootobj, "PLUSMONEYTIME");
+    Setting.PlusMoneyPlus = json_object_get_number(rootobj, "PLUSMONEYPLUS");
+    Setting.PeeOfDay = json_object_get_number(rootobj, "PEEOFDAY");
 }

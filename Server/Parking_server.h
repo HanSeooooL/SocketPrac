@@ -50,6 +50,20 @@ typedef struct _salesdata {
    char *name;
 } Salesdata;
 
+typedef struct _parkingplaceSetting {
+    int MaxCarSize;
+    int FirstPee;
+    int FirstPeeTime;
+    int NextPee;
+    int NextPeeTime;
+    short GetWeekendPee;
+    int GetBigCarPeePercent;
+    int ChangePlusMoney;
+    int PlusMoneyTime;
+    int PlusMoneyPlus;
+    int PeeOfDay;
+} ParkingplaceSetting;
+
 //Programinside
 int Stringtoint(char *str);
 char* substring(char *str, int start, int length);

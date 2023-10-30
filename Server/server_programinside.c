@@ -78,7 +78,7 @@ char* returntimetoday(void) {
     time_t currtime;
     time(&currtime);
     char *res = NULL;
-    res = (char*)malloc(sizeof(char) * LIMITTIMESIZE);
+    res = (char*)malloc(sizeof(char) * SIXDAYSIZE);
     
     struct tm nowtime;
     nowtime = *localtime(&currtime);
