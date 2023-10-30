@@ -77,4 +77,8 @@ void init_socket(); //소켓 초기화
 void ListenFromtheClient(); //소켓 듣기 상태
 int sendthedata(char* data, int datasize); //클라이언트에 데이터 보내기
 
+
+//FileInOut
+void getSetting();  //주차장 설정 불러오기
+
 #endif
