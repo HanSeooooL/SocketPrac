@@ -7,11 +7,12 @@ typedef struct _node {
     struct _node* left, *right;
 } Node;
 
-Node *root;
+Node *intimeroot;
+Node *Carnumberroot;
 
 void init_root() {}
 
-Node* insertData(Node* node, Element data) {
+Node* insertData_intime(Node* node, Element data) {
     if(node == NULL) {
         Node* newNode = (Node*)malloc(sizeof(Node));
         newNode -> data = data;
@@ -28,14 +29,13 @@ Node* insertData(Node* node, Element data) {
             node -> right = Insert(node -> right, data);
         }
         else {
-
+            //같은 데이터일 때 사용할 코드
         }
-
         return node;
     }
 }
 
-Node* serachData(Node* node, Element data) {
+Node* serachData_intime(Node* node, Element data) {
     if (node == NULL) reutrn NULL;
 
     if(node -> data.intime == data.intime) {
@@ -87,4 +87,12 @@ Node* deleteData(Node* node, int data) {
         fre(deleteNode);
         return node;
     }
+}
+
+void printinorderBST(Node* root) {
+    if(root == NULL) return;
+
+    printinorderBST(root -> left);
+    printf("%d\n", root -> data.intime);
+    printinorderBST(root -> right);
 }
