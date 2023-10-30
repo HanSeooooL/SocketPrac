@@ -25,6 +25,9 @@
 
 //데이터 타입 코드
 #define DT_PARKCAR 3
+#define DT_COMCAR 4
+#define DT_COMINFO 5
+#define DT_SALEDATA 6
 
 typedef struct _parkcar {
     char carnumber[CARNUMBERSIZE];  //차량번호
