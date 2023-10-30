@@ -69,7 +69,7 @@ int Stringtoint(char *str);
 char* substring(char *str, int start, int length);
 void requestsavetheCardata(char* message);
 void requestchangethedata(int *clnt_sock, char* message);
-void requestdeletethedata(char* message);
+void requestExchangetheCar(char* message);
 void requestgivethedata(char* message, int page);
 
 //Network

@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+
 extern void savethecar(Parkcar newone);
 extern void readParkinginfo(void);
 extern Parkcar searchtheCar(char *targetcarnumber, int *count);
@@ -26,7 +27,6 @@ void error_handling(char *message)
    fputc('\n', stderr);
    exit(1);
 }
-
 
 void Carin(Parkcar newone) {    //작동
     strcpy(newone.intime, returntimetomin());
@@ -239,9 +239,16 @@ void requestchangethedata(int *clnt_sock, char* message) {
 
 }
 
-void requestdeletethedata(char* message) {
-   FILE* fp;
-   
+void requestExchangetheCar(char* message) {
+    FILE* fp;
+    char str[BUF_SIZE];
+    fp = fopen("Cars.txt", "r");
+
+    fseek(fp, SEEK_SET, (Stringtoint(substring(message, 2, 2)) - 1) * PAGEDATACOUNT + 
+    Stringtoint(substring(message, 4, 2)));
+
+
+    fclose(fp);
 }
 
 void requestgivethedata(char* message, int page) {
