@@ -1,22 +1,20 @@
 
 #define MAX_CHAR_PER_LINE 1024
 
-#define PARKINGCARINFOROUTE "parkcar.txt"
+#define PARKINGCARINFOROUTE "Parkinginfo.bin"
+#define COMMUTERCARROUTE "CommuterCar.bin"
 #define COMMUTERINFOROUTE "Commuterinfo.txt"
+#define SALESROUTE "Sales.txt"
+#define FEEOPTIONROUTE "Feeoptioninfo.txt"
 #define PLACEINFOROUTE "Placeinfo.txt"
 #define THREADLIMIT 100
 
 #include "Parking_server.h"
 #include "parson.h"
 #include <unistd.h>
-#include <pthread.h>
 #include <stdarg.h>
 
-pthread_t pthreadarr[THREADLIMIT];
-
 ParkingplaceSetting Setting;
-
-static pthread_mutex_t Key_parkcar;
 
 typedef Parkcar Element;
 typedef struct LinkedNode {
@@ -41,16 +39,6 @@ Element dequeue(void);  //데이터 가져오기(큐에서 삭제)
 Element peek(void);     //데이터 가져오기(큐에서 삭제X)
 void destroy_queue(void);   //큐 초기화
 void print_queue(char *msg);
-
-void init_thread(void* func, int num, ...) {
-    //func = 함수포인터 num = 인자 개수
-    va_list ap;
-    va_start(ap, num);
-}
-
-void init_mutex(void) {
-    pthread_mutex_init(&Key_parkcar, NULL);
-}
 
 void init_Parkingcarinfo(void) {
     FILE *fp;
@@ -88,6 +76,45 @@ void savethecar(Parkcar newone) {
         fprintf(fp, "\n");
     }
     fclose(fp);
+}
+
+
+void* readFile(char* filename, int startline, int count) {
+    //filename = 읽을 파일 이름, startline = 읽을 첫번째 라인, count = 첫번째 라인으로부터 몇라인 읽을지
+    FILE *fp;
+    char line[MAX_CHAR_PER_LINE];
+    void* res;
+
+    if(access(filename, F_OK) == -1) return NULL;
+
+    if(filename == PARKINGCARINFOROUTE) {
+        if(count != 0) {
+            int i = 0;
+            res = (Parkcar*)malloc(sizeof(Parkcar) * count);
+            while(fgets(line, MAX_CHAR_PER_LINE, fp) && count > 0) {
+                
+            }
+        }
+        else {
+            
+        }
+    }
+
+
+    fclose(fp);
+}
+
+void readFiletail(char* filename, FILE *fp, int *count, void* res) {
+    char line[MAX_CHAR_PER_LINE];
+    if(fgets(line, MAX_CHAR_PER_LINE, fp) == NULL) return NULL;
+    else {readFiletail(filename, fp, count, res);}
+    if(filename == PARKINGCARINFOROUTE) {
+        strcpy(((Parkcar*)res)[*count - 1].carnumber, substring(line, 0, CARNUMBERSIZE - 1));
+        strcpy(((Parkcar*)res)[*count - 1].phonenumber, substring(line, CARNUMBERSIZE - 1, PHONENUMBERSIZE - 1));
+        strcpy(((Parkcar*)res)[*count - 1].intime, substring(line, (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
+    }
+
+    --(*count);
 }
 
 void readParkinginfo(void) {
@@ -215,6 +242,20 @@ void print_queue(char *msg)
     printf("\n");
 }
 
+void getPlaceinfo() {
+    
+}
+
+void getFeeoptioninfo() {
+
+}
+
+void getSetting() {
+    getPlaceinfo();
+    getFeeoptioninfo();
+}
+
+/*
 void getSetting() {
     JSON_Value *rootvalue;
     JSON_Object *rootobj;
@@ -234,3 +275,4 @@ void getSetting() {
     Setting.PlusMoneyPlus = json_object_get_number(rootobj, "PLUSMONEYPLUS");
     Setting.PeeOfDay = json_object_get_number(rootobj, "PEEOFDAY");
 }
+*/
