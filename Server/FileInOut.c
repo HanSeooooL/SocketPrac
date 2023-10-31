@@ -10,6 +10,7 @@
 
 
 #define PARKINGCARINFORECORDSIZE 32
+#define COMMUTERCARRECORDSIZE 15
 
 #include "Parking_server.h"
 #include "parson.h"
@@ -82,18 +83,28 @@ void savethecar(Parkcar newone) {
 
 void* readFiletail(char* filename, FILE *fp, int *count, void* res) {
     char line[MAX_CHAR_PER_LINE];
+    void* check;
     if(fgets(line, MAX_CHAR_PER_LINE, fp) == NULL) {
-        res = (Parkcar*)malloc(sizeof(Parkcar) * (*count));
+        if((*count) > 0) {
+            if(strcmp(filename, PARKINGCARINFOROUTE) == 0) {
+                res = (Parkcar*)malloc(sizeof(Parkcar) * (*count));
+            }
+            else if(strcmp(filename, COMMUTERCARROUTE) == 0) {
+                res = (Commutercar*)malloc(sizeof(Commutercar) * (*count));
+            }
+        }
         return NULL;
     }
     else {
         ++(*count);
-        readFiletail(filename, fp, count, res);
     }
-    if(filename == PARKINGCARINFOROUTE) {
+    if(strcmp(filename, PARKINGCARINFOROUTE) == 0) {
         strcpy(((Parkcar*)res)[*count - 1].carnumber, substring(line, 0, CARNUMBERSIZE - 1));
         strcpy(((Parkcar*)res)[*count - 1].phonenumber, substring(line, CARNUMBERSIZE - 1, PHONENUMBERSIZE - 1));
         strcpy(((Parkcar*)res)[*count - 1].intime, substring(line, (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
+    }
+    if(strcmp(filename, COMMUTERCARROUTE) == 0) {
+        
     }
 
     if(*count == 0) return res;
@@ -103,28 +114,42 @@ void* readFiletail(char* filename, FILE *fp, int *count, void* res) {
 
 void* readFile(char* filename, int startline, int count) {
     //filename = 읽을 파일 이름, startline = 읽을 첫번째 라인, count = 첫번째 라인으로부터 몇라인 읽을지
+    //NULL 리턴시 파일 이름 오류.
     FILE *fp;
     char line[MAX_CHAR_PER_LINE];
+    int i = 0;
     void* res;
 
     if(access(filename, F_OK) == -1) return NULL;
+    fp = fopen(filename, "r");
 
     if(strcmp(filename, PARKINGCARINFOROUTE) == 0) {
-        fp = fopen(filename, "r");
         fseek(fp, SEEK_SET, PARKINGCARINFORECORDSIZE * startline);
         if(count != 0) {
-            int i = 0;
             res = (Parkcar*)malloc(sizeof(Parkcar) * count);
             while(fgets(line, MAX_CHAR_PER_LINE, fp) && i < count) {
                 strcpy(((Parkcar*)res)[i].carnumber, substring(line, 0, CARNUMBERSIZE - 1));
                 strcpy(((Parkcar*)res)[i].phonenumber, substring(line, CARNUMBERSIZE - 1, PHONENUMBERSIZE - 1));
                 strcpy(((Parkcar*)res)[i].intime, substring(line, (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
-                i++;
+                ++i;
             }
         }
         else {
-            int i = 0;
             res = readFiletail(PARKINGCARINFOROUTE, fp, &i, res);
+        }
+    }
+    else if(strcmp(filename, COMMUTERCARROUTE) == 0) {
+        fseek(fp, SEEK_SET, COMMUTERCARRECORDSIZE * startline);
+        if(count != 0) {
+            res = (Commutercar*)malloc(sizeof(Commutercar) * count);
+            while(fgets(line, MAX_CHAR_PER_LINE, fp) && i < count) {
+                strcpy(((Commutercar*)res)[i].carnumber, substring(line, 0, CARNUMBERSIZE - 1));
+                strcpy(((Commutercar*)res)[i].limittime, substring(line, CARNUMBERSIZE -1, SIXDAYSIZE));
+                ++i;
+            }
+        }
+        else {
+            res = readFiletail(COMMUTERCARROUTE, fp, &i, res);
         }
     }
     fclose(fp);
