@@ -136,6 +136,20 @@ void printDataList(int x, int y, int colgap, int rawgap, int datacount, void* da
             y += rawgap;
         }
     }
+
+    else if(datatype = DT_COMCAR) {
+
+    }
+    
+    else if(datatype = DT_COMINFO) {
+
+    }
+
+    else if(datatype = DT_SALEDATA) {
+
+    }
+
+    else perror("데이터 타입 오류!!!!!!!!!!!");
 }
 
 void printGraph(int x, int y, int alldata, int successdata) {
