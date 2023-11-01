@@ -7,3 +7,4 @@ Parking_*
 Client/UI
 *.exe
 WinNetwork.c
+.vscode/
