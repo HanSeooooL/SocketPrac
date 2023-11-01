@@ -84,7 +84,7 @@ Node* deleteData(Node* node, int data) {
             node = minNode;
         }
 
-        fre(deleteNode);
+        free(deleteNode);
         return node;
     }
 }
