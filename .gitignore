@@ -7,3 +7,4 @@ Parking_*
 Client/UI/
 pthreadtest/pthreadtest
 build/
+.vscode/
