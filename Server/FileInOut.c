@@ -43,11 +43,10 @@ Element peek(void);     //데이터 가져오기(큐에서 삭제X)
 void destroy_queue(void);   //큐 초기화
 void print_queue(char *msg);
 
-void* readFile(char* filename, int startline, int count);
-void* readFiletail(char* filename, FILE *fp, int *count, void* res);
+void* readFile(char* filename, int startline, int count, int *n);
+void* readFiletail(char* filename, FILE *fp, int *count, void* res, int *n);
 void savethecar(Parkcar newone);
 void readParkinginfo(void);
-void deletetheCar(int count);
 
 void init_Parkingcarinfo(void) {
     FILE *fp;
@@ -87,27 +86,31 @@ void savethecar(Parkcar newone) {
     fclose(fp);
 }
 
-void* readFiletail(char* filename, FILE *fp, int *count, void* res) {
+void* readFiletail(char* filename, FILE *fp, int *count, void* res, int *n) {
     char line[MAX_CHAR_PER_LINE];
-    void* check;
+
     if(fgets(line, MAX_CHAR_PER_LINE, fp) == NULL) {
         if((*count) > 0) {
+
             if(strcmp(filename, PARKINGCARINFOROUTE) == 0) {
-                res = (Parkcar*)malloc(sizeof(Parkcar) * (*count));
+                res = malloc(sizeof(Parkcar) * (*count));
             }
             else if(strcmp(filename, COMMUTERCARROUTE) == 0) {
-                res = (Commutercar*)malloc(sizeof(Commutercar) * (*count));
+                res = malloc(sizeof(Commutercar) * (*count));
             }
         }
         return NULL;
     }
     else {
-        ++(*count);
+        (*count) += 1;
+        readFiletail(filename, fp, count, res, n);
     }
     if(strcmp(filename, PARKINGCARINFOROUTE) == 0) {
+
         strcpy(((Parkcar*)res)[*count - 1].carnumber, substring(line, 0, CARNUMBERSIZE - 1));
         strcpy(((Parkcar*)res)[*count - 1].phonenumber, substring(line, CARNUMBERSIZE - 1, PHONENUMBERSIZE - 1));
         strcpy(((Parkcar*)res)[*count - 1].intime, substring(line, (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
+
     }
     else if(strcmp(filename, COMMUTERCARROUTE) == 0) {
         strcpy(((Commutercar*)res)[*count - 1].carnumber, substring(line, 0, CARNUMBERSIZE - 1));
@@ -117,9 +120,10 @@ void* readFiletail(char* filename, FILE *fp, int *count, void* res) {
     if(*count == 0) return res;
     
     --(*count);
+    ++(*n);
 }
 
-void* readFile(char* filename, int startline, int count) {
+void* readFile(char* filename, int startline, int count, int *n) {
     //filename = 읽을 파일 이름, startline = 읽을 첫번째 라인, count = 첫번째 라인으로부터 몇라인 읽을지
     //NULL 리턴시 파일 이름 오류.
     FILE *fp;
@@ -140,9 +144,11 @@ void* readFile(char* filename, int startline, int count) {
                 strcpy(((Parkcar*)res)[i].intime, substring(line, (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
                 ++i;
             }
+            *n = i;
         }
         else {
-            res = readFiletail(PARKINGCARINFOROUTE, fp, &i, res);
+            res = readFiletail(PARKINGCARINFOROUTE, fp, &i, res, n);
+
         }
     }
     else if(strcmp(filename, COMMUTERCARROUTE) == 0) {
@@ -156,81 +162,13 @@ void* readFile(char* filename, int startline, int count) {
             }
         }
         else {
-            res = readFiletail(COMMUTERCARROUTE, fp, &i, res);
+            res = readFiletail(COMMUTERCARROUTE, fp, &i, res, n);
         }
     }
     fclose(fp);
 
     return res;
 }
-
-void readParkinginfo(void) {
-    FILE *fp;
-    char line[MAX_CHAR_PER_LINE];
-    Parkcar newone;
-    if(access(PARKINGCARINFOROUTE, F_OK) != -1) { //파일이 있는 경우
-        destroy_queue();
-        fp = fopen(PARKINGCARINFOROUTE, "r");
-        while(fgets(line, MAX_CHAR_PER_LINE, fp)) {
-            strncpy(newone.carnumber, line, CARNUMBERSIZE - 1);
-            newone.carnumber[CARNUMBERSIZE - 1] = '\0';
-            strncpy(newone.phonenumber, &line[CARNUMBERSIZE - 1], PHONENUMBERSIZE - 1);
-            newone.phonenumber[PHONENUMBERSIZE - 1] = '\0';
-            strncpy(newone.intime, &line[(CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1)], INTIMESIZE - 1);
-            newone.intime[INTIMESIZE - 1] = '\0';
-            enqueue(newone);
-        }
-    }
-    else error("파일이 없습니다");
-    fclose(fp);
-}
-
-void deletetheCar(int count) {
-    FILE *fp;
-    Parkcar one;
-    int limit = size();
-    if(access(PARKINGCARINFOROUTE, F_OK) != -1) {
-        readParkinginfo();
-        fp = fopen(PARKINGCARINFOROUTE, "w");
-        for(int i = 0; i <= limit; i++) {
-            count -= 1;
-            one = dequeue();
-            if(count == 0) {
-                count = -1;
-            }
-            else {
-                fprintf(fp, "%s", one.carnumber);
-                fprintf(fp, "%s", one.phonenumber);
-                fprintf(fp, "%s", one.intime);
-                fprintf(fp, "\n");
-            }
-        }
-        
-    }
-    else error("파일이 없습니다");
-    
-    fclose(fp);
-}
-
-Parkcar searchtheCar(char *targetcarnumber, int *count) {
-    Parkcar searching;
-    destroy_queue();
-    readParkinginfo();
-    
-    for(int i = 0; i <= size(); i++) {
-        
-        *count += 1;
-        searching = dequeue();
-        if(!strcmp(searching.carnumber, targetcarnumber)) {
-            
-            return searching;   //존재하는 경우 구조체 반환 및 count포인터를 통한 순서 반환
-        }
-    }
-    
-    *count = FAIL; //차량을 찾지 못했습니다.
-    return searching;
-}
-
 
 
 int size(void)  //큐 크기 확인

@@ -92,26 +92,7 @@ void ListenFromtheClient() {
                   printf("closed client: %d \n", i);
                }
                else {
-                  if(message[0] == '1') {
-                     requestsavetheCardata(message);
-                     write(clnt_sock, "Save done!\n", 11);
-                  }
                   
-                  else if(message[0] == '2') {
-                     requestExchangetheCar(message);
-                     write(clnt_sock, "Exchange done!\n", 13);
-                  }
-
-                  else if(message[0] == '2') {
-                     
-                     write(clnt_sock, "Delete done!\n", 13);
-                  }
-
-                  else if(message[0] == '3') {
-                     requestgivethedata(message, Stringtoint(substring(message, 1, 2)));
-                  }
-
-                  else write(clnt_sock, "Sign Error!\n", 12);
                }
             }
          }

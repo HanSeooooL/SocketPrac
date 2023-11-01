@@ -43,6 +43,14 @@
 #define DT_COMINFO 5
 #define DT_SALEDATA 6
 
+//파일 경로
+#define PARKINGCARINFOROUTE "Parkinginfo.bin"
+#define COMMUTERCARROUTE "CommuterCar.bin"
+#define COMMUTERINFOROUTE "Commuterinfo.txt"
+#define SALESROUTE "Sales.txt"
+#define FEEOPTIONROUTE "Feeoptioninfo.txt"
+#define PLACEINFOROUTE "Placeinfo.txt"
+
 
 
 void error_handling(char *message);
@@ -102,5 +110,6 @@ int sendthedata(char* data, int datasize); //클라이언트에 데이터 보내
 
 //FileInOut
 void getSetting();  //주차장 설정 불러오기
+void* readFile(char* filename, int startline, int count, int *n); //파일 읽기
 
 #endif
