@@ -5,3 +5,7 @@ Parking_*
 ./Cars.txt
 *.txt
 Client/UI
+*.exe
+WinNetwork.c
+
+.vscode/

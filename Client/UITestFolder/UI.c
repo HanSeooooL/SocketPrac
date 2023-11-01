@@ -5,7 +5,7 @@
 #include <conio.h>
 #include <stdarg.h>
 
-//UI°ü·Ã »ó¼ö
+//UIê´€ë ¨ ìƒìˆ˜
 #define SCREENCOLS 138
 #define SCREENLINES 42
 #define BUTTONHOR 26
@@ -19,7 +19,7 @@ INPUT_RECORD rec;
 DWORD dwNOER;
 HANDLE CIN = 0;
 
-//ClickÃ¼Å©¿ë ÁÂÇ¥ ±â·Ï
+//Clickì²´í¬ìš© ì¢Œí‘œ ê¸°ë¡
 int *menux, *menuy, saved;
 int *elementx, *elementy, elementsaved;
 
@@ -29,7 +29,7 @@ void gotoxy(int x, int y)	//gotoxy
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
-void textcolor(int color_number)	//±ÛÀÚ »ö
+void textcolor(int color_number)	//ê¸€ì ìƒ‰
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
 }
@@ -78,14 +78,15 @@ void printText(int x, int y, char* text) {
 }
 
 void defaultscreensetting() {
+    SetConsoleOutputCP(CP_UTF8);
     system("mode con cols=138 lines=42");
-	system("ÁÖÂ÷Àå Á¤»ê°ü¸® ÇÁ·Î±×·¥");
+	system("ì£¼ì°¨ì¥ ì •ì‚°ê´€ë¦¬ í”„ë¡œê·¸ë¨");
     SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
     incursor(0);
 }
 
 void printScreenTitle(char* title) {
-    //ÀÔ·ÂµÈ ¹®ÀÚ¿­À» È­¸éÀÇ °¡Àå À§ Á¤Áß¾Ó¿¡ Ãâ·ÂÇÏ´Â ÇÔ¼ö
+    //ì…ë ¥ëœ ë¬¸ìì—´ì„ í™”ë©´ì˜ ê°€ì¥ ìœ„ ì •ì¤‘ì•™ì— ì¶œë ¥í•˜ëŠ” í•¨ìˆ˜
     int str_len, halfscreen;
     str_len = strlen(title);
     halfscreen = getCenterofhorizonal(0, SCREENCOLS, str_len);
@@ -113,20 +114,20 @@ int getCenterofVertical(int vero, int vert, int ylen) {
 }
 
 void printTexttoCenter(int horo, int vero, int hort, int vert, char* text) {
-    //xÃà°ú yÃàÀ» ¹Ş¾Æ¼­ Áß½ÉÁÂÇ¥¿¡ textÃâ·Â
+    //xì¶•ê³¼ yì¶•ì„ ë°›ì•„ì„œ ì¤‘ì‹¬ì¢Œí‘œì— textì¶œë ¥
     int destination, horres, verres;
     horres = getCenterofhorizonal(horo, hort, strlen(text));
     verres = getCenterofVertical(vero, vert, 0);
-    if(horres == FAIL) error_handling("°ø°£ÀÌ ³Ê¹« ÀÛ½À´Ï´Ù.(printTexttoCenter)");
+    if(horres == FAIL) error_handling("ê³µê°„ì´ ë„ˆë¬´ ì‘ìŠµë‹ˆë‹¤.(printTexttoCenter)");
     printText(horres, verres, text);
 }
 
 void printDataList(int x, int y, int colgap, int rawgap, int datacount, void* data, short datatype) {
-    //x, y = ½ÃÀÛ ÁÂÇ¥ colgap = °¡·Î °£°İ rawgap = ¼¼·Î °£°İ datacount = µ¥ÀÌÅÍ °³¼ö data = Ãâ·ÂÇÒ µ¥ÀÌÅÍ ÁÖ¼Ò datatype = Ãâ·ÂÇÒ µ¥ÀÌÅÍÀÇ Å¸ÀÔ
+    //x, y = ì‹œì‘ ì¢Œí‘œ colgap = ê°€ë¡œ ê°„ê²© rawgap = ì„¸ë¡œ ê°„ê²© datacount = ë°ì´í„° ê°œìˆ˜ data = ì¶œë ¥í•  ë°ì´í„° ì£¼ì†Œ datatype = ì¶œë ¥í•  ë°ì´í„°ì˜ íƒ€ì…
     if(datatype == DT_PARKCAR) {
-        printText(x, y, "Â÷·®¹øÈ£");
-        printText(x + colgap, y, "ÀüÈ­¹øÈ£");
-        printText(x + (colgap * 2), y, "ÀÔÂ÷½Ã°¢");
+        printText(x, y, "ì°¨ëŸ‰ë²ˆí˜¸");
+        printText(x + colgap, y, "ì „í™”ë²ˆí˜¸");
+        printText(x + (colgap * 2), y, "ì…ì°¨ì‹œê°");
         y += rawgap;
 
         for(int i = 0; i < datacount; i++) {
@@ -155,29 +156,29 @@ void printGraph(int x, int y, int alldata, int successdata) {
 }
 
 void makeBox(int x, int y, int hor, int ver) {
-    //hor = °¡·Î ver = ¼¼·Î
-    //(x, y) = ½ÃÀÛÁÂÇ¥(¿ŞÂÊ ²ÀÁşÁ¡ ÁÂÇ¥)
-    //ÀÔ·ÂµÈ °¡·Î¼¼·Î Å©±âÀÇ »óÀÚ¸¦ Ãâ·ÂÇÏ´Â ÇÔ¼ö
+    //hor = ê°€ë¡œ ver = ì„¸ë¡œ
+    //(x, y) = ì‹œì‘ì¢Œí‘œ(ì™¼ìª½ ê¼­ì§“ì  ì¢Œí‘œ)
+    //ì…ë ¥ëœ ê°€ë¡œì„¸ë¡œ í¬ê¸°ì˜ ìƒìë¥¼ ì¶œë ¥í•˜ëŠ” í•¨ìˆ˜
     for (int i = 0; i < ver; i++) {
         gotoxy(x, y);
         if(i == 0) {
-            printf("¦®");
+            printf("â”");
             for(int i = 0; i < hor - 2; i++) {
-                printf("¦¬");
+                printf("â”");
             }
-            printf("¦¯");
+            printf("â”“");
         }
         else if(i == ver - 1) {
-            printf("¦±");
+            printf("â”—");
             for(int i = 0; i < hor - 2; i++) {
-                printf("¦¬");
+                printf("â”");
             }
-            printf("¦°");  
+            printf("â”›");  
         }
         else {
-            printf("¦­");
+            printf("â”ƒ");
             gotoxy(x + hor - 1, y);
-            printf("¦­");
+            printf("â”ƒ");
         }
         y += 1;
     }
@@ -255,7 +256,7 @@ void Layout4(char* title, int leftboxx, int leftboxy, int rightboxx, int rightbo
 }
 
 char** makeButtonNameArray(int count, ...) {
-    //count = ¹®ÀÚ¿­ °³¼ö, ±× µÚ¿¡ ¹®ÀÚ¿­ ÀÔ·Â
+    //count = ë¬¸ìì—´ ê°œìˆ˜, ê·¸ ë’¤ì— ë¬¸ìì—´ ì…ë ¥
     va_list ap;
     int i;
     char** strarr = NULL;
@@ -344,8 +345,8 @@ void UI_0000() {
     int xx, yy, lr, choice;
     Parkcar *array;
     array = (Parkcar*)malloc(sizeof(Parkcar) * 10);
-    Layout1("ÁÖÂ÷ Á¤»ê°ü¸® ÇÁ·Î±×·¥");
-    Layout1_menuButtons(1, 3, makeButtonNameArray(3, "ÀÔÂ÷", "ÁÖÂ÷Â÷·®°Ë»ö", "Á¤±â±Ç °ü¸®"));
+    Layout1("ì£¼ì°¨ ì •ì‚°ê´€ë¦¬ í”„ë¡œê·¸ë¨");
+    Layout1_menuButtons(1, 3, makeButtonNameArray(3, "ì…ì°¨", "ì£¼ì°¨ì°¨ëŸ‰ê²€ìƒ‰", "ì •ê¸°ê¶Œ ê´€ë¦¬"));
     readParkinginfo();
     for(int i = 0; i < 2; i++) {
         array[i] = dequeue();
@@ -375,6 +376,7 @@ void UI_0000() {
 }
 
 void ProgramStart() {
+    ConnectNetwork();
     defaultscreensetting();
     UI_0000();
 }
