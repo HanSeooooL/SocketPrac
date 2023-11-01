@@ -247,13 +247,10 @@ char* makeIntotoString(int num) {
     return res;
 }
 
-char* makeMessagefromData(void* data, int datatype) {
+char* makeMessagefromData(void* data, int datatype, int count) {
     char* res;
-    int count;
-    size_t size;
 
     if(datatype == DT_PARKCAR) {
-        count = _msize(data) / sizeof(Parkcar);
         res = (char*)malloc(sizeof(char) * (count * PARKCARRECORDSIZE));
         res[0] = '\0';
         for(int i = 0; i < count; i++) {
@@ -271,7 +268,6 @@ char* makeMessagefromData(void* data, int datatype) {
         char *tmp = NULL, *tmp1 = NULL, *tmp2 = NULL;
         int *size, fullsize = 0;
         Charnode *head = NULL, *tail = NULL;
-        count = _msize(data) / sizeof(Commuterinfo);
         size = (int*)malloc(sizeof(int) * count);
         for(int i = 0; i < count; i++) {
             tmp1 = makeIntotoString(((Commuterinfo*)data)[i].bill);
@@ -302,9 +298,10 @@ char* makeMessagefromData(void* data, int datatype) {
         free(size);
 
         res = (char*)malloc(fullsize);
+        res[0] = '\0';
 
         for(int i = 0; i < count; i++) {
-
+            strcat(res, dequeue_Charnode(head, tail));
         }
     }
 
@@ -366,13 +363,14 @@ void server_console() {
 }
 
 int isEmpty_Charnode(Charnode *head, Charnode *tail) {
-    return (head == tail);
+    return (head == NULL);
 }
 
 void enqueue_Charnode(char *newone, Charnode *head, Charnode *tail) {
     Charnode *tmp = (Charnode*)malloc(sizeof(Charnode));
     tmp -> data = newone;
-    if (isEmpty_Charnode) head = tmp;
+    tmp -> next = NULL;
+    if (isEmpty_Charnode(head, tail)) head = tail = tmp;
     
     else {
         tail -> next = tmp;
@@ -382,11 +380,15 @@ void enqueue_Charnode(char *newone, Charnode *head, Charnode *tail) {
 
 char* dequeue_Charnode(Charnode *head, Charnode *tail) {
     char* res;
-    if(isEmpty_Charnode) perror("큐 공백 에러");
+    Charnode *tmp;
+    if(isEmpty_Charnode(head, tail)) perror("큐 공백 에러");
 
     else {
-        res = head -> data;
-        
+        tmp = head;
+        head = head -> next;
+        if(head == NULL) tail = NULL;
+        res = tmp -> data;
+        free(tmp);
     }
     return res;
 }
