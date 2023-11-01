@@ -8,7 +8,8 @@
     "parking_client.h": "c",
     "select.h": "c",
     "time.h": "c",
-    "parking_server.h": "c"
+    "parking_server.h": "c",
+    "stdarg.h": "c"
   },
   "cmake.configureOnOpen": false,
   "C_Cpp_Runner.msvcBatchPath": "",

@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/hanseol/SocketPrac/pthreadtest/sematest",
-      "program": "/Users/hanseol/SocketPrac/pthreadtest/sematest/build/Debug/outDebug"
+      "cwd": "/Users/hanseol/Socketprac/Server",
+      "program": "/Users/hanseol/Socketprac/Server/build/Debug/outDebug"
     }
   ]
 }
