@@ -43,6 +43,12 @@ Element peek(void);     //데이터 가져오기(큐에서 삭제X)
 void destroy_queue(void);   //큐 초기화
 void print_queue(char *msg);
 
+void* readFile(char* filename, int startline, int count);
+void* readFiletail(char* filename, FILE *fp, int *count, void* res);
+void savethecar(Parkcar newone);
+void readParkinginfo(void);
+void deletetheCar(int count);
+
 void init_Parkingcarinfo(void) {
     FILE *fp;
     fp = fopen(PARKINGCARINFOROUTE, "w");
@@ -103,8 +109,9 @@ void* readFiletail(char* filename, FILE *fp, int *count, void* res) {
         strcpy(((Parkcar*)res)[*count - 1].phonenumber, substring(line, CARNUMBERSIZE - 1, PHONENUMBERSIZE - 1));
         strcpy(((Parkcar*)res)[*count - 1].intime, substring(line, (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
     }
-    if(strcmp(filename, COMMUTERCARROUTE) == 0) {
-        
+    else if(strcmp(filename, COMMUTERCARROUTE) == 0) {
+        strcpy(((Commutercar*)res)[*count - 1].carnumber, substring(line, 0, CARNUMBERSIZE - 1));
+        strcpy(((Commutercar*)res)[*count - 1].limittime, substring(line, CARNUMBERSIZE - 1, SIXDAYSIZE - 1));
     }
 
     if(*count == 0) return res;

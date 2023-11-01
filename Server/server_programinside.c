@@ -4,6 +4,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <math.h>
+
+
+typedef struct _charnode {
+    char* data;
+    struct _charnode* next;
+} Charnode;
 
 
 extern void savethecar(Parkcar newone);
@@ -13,9 +20,17 @@ extern void deletetheCar(int count);
 
 extern void print_queue(char *msg);
 
+//Charnode queue
+int isEmpty_Charnode(Charnode *head, Charnode *tail);
+void enqueue_Charnode(char *newone, Charnode *head, Charnode *tail);
+char* dequeue_Charnode(Charnode *head, Charnode *tail);
+
+
+int intlen(int x);
 char* returntimetoday(void);
 char* returntimetomin(void);
 int Stringtoint(char *str); //문자열 -> 정수변환
+char* makeIntotoString(int num);
 char* substring(char *str, int start, int length); //문자열 부분 자르기(자를 문자열, 시작지점, 길이)
 int checkMaxDayofMonth(int year, int month); //특정 년월의 일수 체크
 int checkParkingdays(char *starttime);    //주차기간 체크
@@ -209,6 +224,98 @@ char* substring(char *str, int start, int length) {
     return res;
 }
 
+int intlen(int x) {
+    int res;
+
+    for(res = 0; x > 0; res++) {
+        x = x / 10;
+    }
+
+    return res;
+}
+
+char* makeIntotoString(int num) {
+    char* res;
+    res = (char*)malloc(sizeof(char) * (intlen(num) + 1));
+    
+    while(num > 0) {
+        for(int i = 1; i < intlen(num) + 1; i++) {
+            res[i - 1] = num / (int)pow(10, (intlen(num) - i)) % (int)pow(10, (intlen(num) - i + 1)) + '0';
+        }
+    }
+    res[intlen(num)] = '\0';
+    return res;
+}
+
+char* makeMessagefromData(void* data, int datatype) {
+    char* res;
+    int count;
+    size_t size;
+
+    if(datatype == DT_PARKCAR) {
+        count = _msize(data) / sizeof(Parkcar);
+        res = (char*)malloc(sizeof(char) * (count * PARKCARRECORDSIZE));
+        res[0] = '\0';
+        for(int i = 0; i < count; i++) {
+            strcat(res, ((Parkcar*)data)[i].carnumber);
+            strcat(res, ((Parkcar*)data)[i].phonenumber);
+            strcat(res, ((Parkcar*)data)[i].intime);
+        }
+    }
+
+    if(datatype == DT_COMCAR) {
+
+    }
+
+    if(datatype == DT_COMINFO) {
+        char *tmp = NULL, *tmp1 = NULL, *tmp2 = NULL;
+        int *size, fullsize = 0;
+        Charnode *head = NULL, *tail = NULL;
+        count = _msize(data) / sizeof(Commuterinfo);
+        size = (int*)malloc(sizeof(int) * count);
+        for(int i = 0; i < count; i++) {
+            tmp1 = makeIntotoString(((Commuterinfo*)data)[i].bill);
+            tmp2 = makeIntotoString(((Commuterinfo*)data)[i].month);
+
+            size[i] = sizeof(char) * (COMMUTERNAMESIZE + SIXDAYSIZE + 
+            intlen(((Commuterinfo*)data)[i].bill) + 1 + intlen(((Commuterinfo*)data)[i].month) + 1);
+            
+            tmp = (char*)malloc(size[i]);
+            
+
+            tmp[0] = '\0';
+            strcat(tmp, ((Commuterinfo*)data)[i].commutername);
+            strcat(tmp, ((Commuterinfo*)data)[i].lastestsaleday);
+            strcat(tmp, tmp1);
+            strcat(tmp, "&\0");
+            strcat(tmp, tmp2);
+            enqueue_Charnode(tmp, head, tail);
+
+            free(tmp1);
+            free(tmp2);
+            tmp = NULL;
+        }
+
+        for(int i = 0; i < count; i++) {
+            fullsize += size[i];
+        }
+        free(size);
+
+        res = (char*)malloc(fullsize);
+
+        for(int i = 0; i < count; i++) {
+
+        }
+    }
+
+    if(datatype == DT_SALEDATA) {
+
+    }
+    
+
+    return res;
+}
+
 void requestsavetheCardata(char* message) {
    FILE* file;
    char *str;
@@ -222,33 +329,6 @@ void requestsavetheCardata(char* message) {
    
 
    fclose(file);
-}
-
-void requestchangethedata(int *clnt_sock, char* message) {
-   FILE* fp;
-   char str[BUF_SIZE];
-   if (access("Cars.txt", 0) != -1) {  //이미 존재하는 파일인 경우 내용 추가
-        fp = fopen("Cars.txt", "r+");
-    }
-    else {
-      error_handling("File not exist!!");
-    }
-    while(fgets(str, BUF_SIZE, fp)) {
-      
-    }
-
-}
-
-void requestExchangetheCar(char* message) {
-    FILE* fp;
-    char str[BUF_SIZE];
-    fp = fopen("Cars.txt", "r");
-
-    fseek(fp, SEEK_SET, (Stringtoint(substring(message, 2, 2)) - 1) * PAGEDATACOUNT + 
-    Stringtoint(substring(message, 4, 2)));
-
-
-    fclose(fp);
 }
 
 void requestgivethedata(char* message, int page) {
@@ -283,4 +363,30 @@ void server_console() {
 
         else printf("다시 입력해주세요.\n");
     }
+}
+
+int isEmpty_Charnode(Charnode *head, Charnode *tail) {
+    return (head == tail);
+}
+
+void enqueue_Charnode(char *newone, Charnode *head, Charnode *tail) {
+    Charnode *tmp = (Charnode*)malloc(sizeof(Charnode));
+    tmp -> data = newone;
+    if (isEmpty_Charnode) head = tmp;
+    
+    else {
+        tail -> next = tmp;
+        tail = tmp;
+    }
+}
+
+char* dequeue_Charnode(Charnode *head, Charnode *tail) {
+    char* res;
+    if(isEmpty_Charnode) perror("큐 공백 에러");
+
+    else {
+        res = head -> data;
+        
+    }
+    return res;
 }
