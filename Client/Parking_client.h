@@ -16,7 +16,10 @@
 #define CARNUMBERSIZE 10        //차량번호크기
 #define PHONENUMBERSIZE 14      //전화번호크기
 #define INTIMESIZE 11           //입차시간크기
-#define LIMITTIMESIZE 7         //만료날짜크기
+#define SIXDAYSIZE 7            //만료날짜크기
+
+#define COMMUTERNAMESIZE 21         //정기권 이름 크기
+
 #define YEARINTIME 0            //시간 데이터에서의 연도 위치
 #define MONINTIME 2             //시간 데이터에서의 월 위치
 #define DAYINTIME 4             //시간 데이터에서의 일 위치
@@ -46,6 +49,25 @@ typedef struct _parkcar {
     char phonenumber[PHONENUMBERSIZE];  //전화번호
     char intime[INTIMESIZE];        //입차시간
 } Parkcar;
+
+typedef struct _commuterinfo {
+    char commutername[COMMUTERNAMESIZE];    //정기권명
+    char lastestsaleday[SIXDAYSIZE];    //최근 구매일
+    int bill;   //가격
+    int month;  //적용기간
+} Commuterinfo;
+
+typedef struct _commutercar {
+    char carnumber[CARNUMBERSIZE]; //차량번호
+    char limittime[SIXDAYSIZE]; //만료일
+} Commutercar;
+
+typedef struct _salesdata {
+   char day[SIXDAYSIZE];
+   int bill;
+   char *type;
+   char *name;
+} Salesdata;
 
 void error_handling(char *message); //오류 출력
 
