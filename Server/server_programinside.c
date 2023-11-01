@@ -15,9 +15,6 @@ typedef struct _charnode {
 
 extern void savethecar(Parkcar newone);
 extern void readParkinginfo(void);
-extern Parkcar searchtheCar(char *targetcarnumber, int *count);
-extern void deletetheCar(int count);
-
 extern void print_queue(char *msg);
 
 //Charnode queue
@@ -46,18 +43,6 @@ void error_handling(char *message)
 void Carin(Parkcar newone) {    //작동
     strcpy(newone.intime, returntimetomin());
     savethecar(newone);
-}
-
-void Carread(void) {    //작동
-    readParkinginfo();
-    print_queue("");
-}
-
-void Carout(char *carnumber) {  //작동
-    int count = 0;
-    searchtheCar(carnumber, &count);
-    if(count == FAIL) {printf("찾지 못했습니다\n");}
-    else deletetheCar(count);
 }
 
 void addCommuter(char *addcar) {
@@ -329,23 +314,11 @@ void requestsavetheCardata(char* message) {
 }
 
 void requestgivethedata(char* message, int page) {
-   int fd;
-   char buf[BUF_SIZE];
-   int file_read_len, chk_write;
-   
-   fd = open("Cars.txt", O_RDONLY);
-   while(1) {
-      memset(buf, 0x00, BUF_SIZE);
-      file_read_len = read(fd, buf, BUF_SIZE);
-      printf("\nread: %s", buf);
-      chk_write = sendthedata(buf, file_read_len);
-      if(file_read_len == EOF | file_read_len == 0) {
-         //chk_write = write(*clnt_sock, "+", BUF_SIZE);
-         printf("finish file\n");
-         break;
-      }
-   }
-   close(fd);
+    void* dataptr;
+    int count = 0;
+    dataptr = readFile(PARKINGCARINFOROUTE, page, PAGEDATACOUNT, &count);
+    message = makeMessagefromData(dataptr, DT_PARKCAR, count);
+    sendthedata(message, strlen(message));
 }
 
 void server_console() {
