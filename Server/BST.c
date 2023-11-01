@@ -8,6 +8,7 @@ typedef struct _node {
 } Node;
 
 Node *intimeroot;
+<<<<<<< HEAD
 Node *Carnumberroot;
 
 void init_root() {}
@@ -96,3 +97,6 @@ void printinorderBST(Node* root) {
     printf("%d\n", root -> data.intime);
     printinorderBST(root -> right);
 }
+=======
+Node *Carnumberroot;
+>>>>>>> ebe7b9e ([update] BST파일 초기화)
