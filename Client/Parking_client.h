@@ -10,6 +10,7 @@
 #define BUF_SIZE 1024   //버퍼 사이즈
 #define PAGEDATACOUNT 10 //페이지당 차량 개수
 
+//데이터 크기
 #define PARKCARRECORDSIZE 32    //주차차량 레코드 크기
 
 #define CARNUMBERSIZE 10        //차량번호크기
@@ -22,6 +23,17 @@
 #define HOURINTIME 6            //시간 데이터에서의 시간 위치
 #define MININTIME 8             //시간 데이터에서의 분 위치
 #define TIMESECTORLEN 2         //시간 데이터에서의 각 구간 길이
+
+//기능 번호
+#define GETALLPARKINGPLACECOUNT '0'     //주차장 총 주차대수 가져오기
+#define SAVEONEPARKCARDATA '1'          //1개의 차량 데이터 저장(입차)
+#define CALCULATEONEPARKCARDATA '2'     //1개의 차량 데이터 정산(출차)
+#define GETPARKCARLISTOFPAGE '3'        //선택 페이지 차량 데이터 가져오기
+#define GETNOWPARKINGCARCOUNT '4'       //현재 주차중인 차량 대수 가져오기
+#define SAVEONECOMMUTERCAR '5'          //정기권 차량 등록
+#define ADDONECOMMUTERCARTIME '6'       //정기권 차량 기간 연장
+#define UPDATECOMMUTERCARNUMBER '7'     //정기권 차량 차량번호 수정
+#define DELETEONECOMMUTERCAR '8'        //정기권 차량 삭제
 
 //데이터 타입 코드
 #define DT_PARKCAR 3
@@ -45,11 +57,8 @@ void get_pagelist(char *data, int str_len); //구조체 배열에 선택 페이�
 void print_pagelist();  //저장된 차량 데이터 출력
 
 //Network
-void init_socket(); //소켓 초기화
-void menu_select();
-void close_socket();
-void requestsavethedata(); //데이터 저장 요청
-Parkcar* requestgivemethecarList(int page); //선택 페이지의 자동차 리스트 요청
+void ConnectNetwork();  //서버 연결
+char* requesttheData(char funccharacter, ...); //데이터 요청 후 정제되지 않은 데이터 문자열 반환
 
 //UI
 void ProgramStart();    //UI실행
