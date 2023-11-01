@@ -9,13 +9,15 @@
 #define BUF_SIZE 1024   //버퍼 사이즈
 #define PAGEDATACOUNT 10 //페이지당 차량 개수
 
+//데이터 크기
 #define PARKCARRECORDSIZE 32    //주차차량 레코드 크기
 
-#define CARNUMBERSIZE 11        //차량번호크기
+#define CARNUMBERSIZE 10        //차량번호크기
 #define PHONENUMBERSIZE 14      //전화번호크기
 #define INTIMESIZE 11           //입차시간크기
-#define COMMUTERNAMESIZE 21     //정기권명 크기
-#define SIXDAYSIZE 7       //연월일 데이터 크기
+#define SIXDAYSIZE 7            //만료날짜크기
+
+#define COMMUTERNAMESIZE 21         //정기권 이름 크기
 
 #define YEARINTIME 0            //시간 데이터에서의 연도 위치
 #define MONINTIME 2             //시간 데이터에서의 월 위치
@@ -24,11 +26,24 @@
 #define MININTIME 8             //시간 데이터에서의 분 위치
 #define TIMESECTORLEN 2         //시간 데이터에서의 각 구간 길이
 
+//기능 번호
+#define GETALLPARKINGPLACECOUNT '0'     //주차장 총 주차대수 가져오기
+#define SAVEONEPARKCARDATA '1'          //1개의 차량 데이터 저장(입차)
+#define CALCULATEONEPARKCARDATA '2'     //1개의 차량 데이터 정산(출차)
+#define GETPARKCARLISTOFPAGE '3'        //선택 페이지 차량 데이터 가져오기
+#define GETNOWPARKINGCARCOUNT '4'       //현재 주차중인 차량 대수 가져오기
+#define SAVEONECOMMUTERCAR '5'          //정기권 차량 등록
+#define ADDONECOMMUTERCARTIME '6'       //정기권 차량 기간 연장
+#define UPDATECOMMUTERCARNUMBER '7'     //정기권 차량 차량번호 수정
+#define DELETEONECOMMUTERCAR '8'        //정기권 차량 삭제
+
 //데이터 타입 코드
 #define DT_PARKCAR 3
 #define DT_COMCAR 4
 #define DT_COMINFO 5
 #define DT_SALEDATA 6
+
+
 
 void error_handling(char *message);
 
