@@ -7,6 +7,3 @@ Parking_*
 Client/UI
 *.exe
 WinNetwork.c
-
-.vscode/
-.vscode/c_cpp_properties.json
