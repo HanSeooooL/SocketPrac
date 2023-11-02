@@ -299,18 +299,12 @@ char* makeMessagefromData(void* data, int datatype, int count) {
 }
 
 void requestsavetheCardata(char* message) {
-   FILE* file;
-   char *str;
-   if (access("Cars.txt", 0) != -1) {  //이미 존재하는 파일인 경우 내용 추가
-        file = fopen("Cars.txt", "a");
-    }
-    else    //없는 경우 생성
-        file = fopen("Cars.txt", "w");
-   str = substring(message, 1, strlen(message) - 2);
-   fprintf(file, "%s\n", str);
-   
 
-   fclose(file);
+    Parkcar tmp;
+    strcpy(tmp.carnumber, substring(message, 1, CARNUMBERSIZE - 1));
+    strcpy(tmp.phonenumber, substring(message, 1 + CARNUMBERSIZE - 1, PHONENUMBERSIZE - 1));
+    strcpy(tmp.intime, substring(message, 1 + CARNUMBERSIZE - 1 + PHONENUMBERSIZE - 1, INTIMESIZE - 1));
+    savethecar(tmp);
 }
 
 void requestgivethedata(char* message, int page) {
