@@ -84,6 +84,7 @@ void print_pagelist();  //저장된 차량 데이터 출력
 //Network
 void ConnectNetwork();  //서버 연결
 char* requesttheData(char funccharacter, ...); //데이터 요청 후 정제되지 않은 데이터 문자열 반환
+Parkcar* requestParkcarlist(int page); //주차차량 목록 요청
 
 //UI
 void ProgramStart();    //UI실행
