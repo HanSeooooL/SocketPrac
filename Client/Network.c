@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <sys/select.h>
 #include <fcntl.h>
+#include <stdarg.h>
 
 #define PORT 1209
 #define MYIP "127.0.0.1"
@@ -148,34 +149,61 @@ void requestsavethedata() {
     printf("Message form server : %s", data);
 }
 
-Parkcar* requestgivemethecarList(int page) {
-    int str_len;
-    char data[BUF_SIZE];
-    Parkcar *res, newone;
+char* requesttheData(char funccharacter, ...) {
+    int count = 0, nRcv = 0, check, i = 0;
+    char message[BUF_SIZE];
+    char *data, *tmp[10];
+    va_list argptr;
 
-    data[0] = '3';
-    data[1] = (page / 10) + 48;
-    data[2] = (page % 10) + 48;
-    write(sock, data, strlen(data));
-    memset(data, 0x00, BUF_SIZE);
-    str_len = read(sock, data, BUF_SIZE);
-    get_pagelist(data, str_len);
-    print_pagelist();
+    message[0] = funccharacter;
+    message[1] = '\0';
 
-    return res;
+    va_start(argptr, count);
+    for(int i = 0; i < count; i++) {
+        strcat(message, va_arg(argptr, char*));
+    }
+
+    send(sock, message, (int)strlen(message), 0);
+
+    do {
+        tmp[i] = (char*)malloc(sizeof(char) * BUF_SIZE);
+        nRcv = recv(sock, tmp[i], sizeof(tmp[i]) - 1, 0);
+        if(nRcv < 0) perror("Receive Error!\n");
+        tmp[i][nRcv] = '\0';
+        ++i;
+        //ioctl(*servSock, FIONREAD, &check);
+        check = 1;
+    } while(check > 0);
+
+    data = (char*)malloc(sizeof(char) * (BUF_SIZE * i));
+    strcpy(data, tmp[0]);
+    for(int j = 1; j < i; j++) {
+        strcat(data, tmp[i]);
+    }
+
+    return data;
 }
 
-void requestDeletetheCar(int page, int count) {
-    int str_len;
-    char data[BUF_SIZE];
+Parkcar* requestParkcarlist(int page) {
+    Parkcar* res;
+    char *data, charpage[3];
+    if(page / 10 == 0) {
+        charpage[0] = '0';
+        charpage[1] = page + '0';
+        charpage[2] = '\0';
+    }
+    else {
+        strcpy(charpage, Inttostring(page));
+    }
 
-    data[0] = '2';
-    data[1] = '\0';
-    strcat(data, Inttostring(page));
-    strcat(data, Inttostring(count));
-    write(sock, data, strlen(data));
-    memset(data, 0x00, BUF_SIZE);
-    str_len = read(sock, data, BUF_SIZE - 1);
-    data[str_len] = 0;
-    printf("Message form server : %s", data);
+    data = requesttheData(GETPARKCARLISTOFPAGE, charpage);
+
+    res = (Parkcar*)malloc(sizeof(Parkcar) * (strlen(data) / PARKCARRECORDSIZE));
+    for(int i = 0; i < (strlen(data) / PARKCARRECORDSIZE); i++) {
+        strcpy(res[i].carnumber, substring(data, PARKCARRECORDSIZE * i, CARNUMBERSIZE - 1));
+        strcpy(res[i].phonenumber, substring(data, PARKCARRECORDSIZE * i + CARNUMBERSIZE - 1, PHONENUMBERSIZE));
+        strcpy(res[i].intime, substring(data, PARKCARRECORDSIZE * i + CARNUMBERSIZE - 1 + PHONENUMBERSIZE - 1, INTIMESIZE));
+    }
+
+    return res;
 }
