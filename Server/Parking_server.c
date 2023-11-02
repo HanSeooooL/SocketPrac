@@ -1,10 +1,42 @@
 //TCP방식 소켓통신
 #include "Parking_server.h"
+#define PARKINGCARINFOROUTE "Parkinginfo.bin"
+#define COMMUTERCARROUTE "CommuterCar.bin"
+#define COMMUTERINFOROUTE "Commuterinfo.txt"
+#define SALESROUTE "Sales.txt"
+#define FEEOPTIONROUTE "Feeoptioninfo.txt"
+#define PLACEINFOROUTE "Placeinfo.txt"
 
-int main(int argc, char *argv[])
+
+
+int main()
 {
-   init_socket();
-   ListenFromtheClient();
+   void* dataptr;
+
+   Parkcar tmp;
+   for(int i = 0; i < 5; i++) {
+      strcpy(tmp.carnumber, "12가3456");
+      strcpy(tmp.phonenumber, "010-2173-4577");
+      strcpy(tmp.intime, "1234567890");
+      savethecar(tmp);
+   }
+   
+
+   dataptr = readFile(PARKINGCARINFOROUTE, 0, 5);
+   
+   for(int i = 0; i < 5; i++) {
+      printf("carnumber: %s\n" , ((Parkcar*)dataptr)[i].carnumber);
+      printf("phonenumber: %s\n" , ((Parkcar*)dataptr)[i].phonenumber);
+      printf("intime: %s\n" , ((Parkcar*)dataptr)[i].intime);
+   }
+
+
+   
+   
+   //init_socket();
+   //ListenFromtheClient();
+
+   
 
 
    /*
@@ -29,4 +61,5 @@ int main(int argc, char *argv[])
    }
    */
    return 0;
+
 }
