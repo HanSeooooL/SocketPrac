@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <math.h>
 
+ParkingplaceSetting PSet;
 
 typedef struct _charnode {
     char* data;
@@ -21,7 +22,6 @@ extern void print_queue(char *msg);
 int isEmpty_Charnode(Charnode *head, Charnode *tail);
 void enqueue_Charnode(char *newone, Charnode *head, Charnode *tail);
 char* dequeue_Charnode(Charnode *head, Charnode *tail);
-
 
 int intlen(int x);
 char* returntimetoday(void);
@@ -47,6 +47,16 @@ void Carin(Parkcar newone) {    //작동
 
 void addCommuter(char *addcar) {
     
+}
+
+void getSetting() {
+    getPlaceinfo(&PSet);
+    getFeeoptioninfo(&PSet);
+}
+
+void saveSetting() {
+    savePlaceinfo(PSet);
+    seveFeeoptioninfo(PSet);
 }
 
 char* returntimetomin(void) {
@@ -95,21 +105,44 @@ char* returntimetoday(void) {
 
 int checkBill(Parkcar selected) {
     
-    int res = 0, days, min;
+    int res = 0, min, Plusmin, tmp;
+    //res 계산된 요금, min 주차시간(분)
     
     //주차시간 분으로 변환
-    days = checkParkingdays(selected.intime);
-    min = days * 24 * 60;
+    min = checkParkingdays(selected.intime);
     
+    if (PSet.PeeOfDay > 0 && min >= 1440) { //일단위를 넘어가고 일 단위 요금이 홣성화되어 있을 때
+        tmp = min / 1440;
+        res += PSet.ChangePlusMoney;
+    }
+
+    else {
+    res += PSet.FirstPee;
+    if(min > PSet.PlusMoneyPlus) {
+        Plusmin = min - PSet.PlusMoneyPlus;
+    }
+    min -= PSet.FirstPeeTime;
+
+    tmp = min / PSet.NextPeeTime;
+    res += PSet.NextPee * tmp;
+
+    tmp = Plusmin / PSet.PlusMoneyTime;
+    res += PSet.ChangePlusMoney * tmp;
+    }
+
+    if(selected.carnumber[0] >= '7' && selected.carnumber[0] <= '9') {  //대형차량의 경우
+        res *= (PSet.GetBigCarPeePercent + 100);
+    }
     
+
     return res;
 }
 
 int checkParkingdays(char *starttime) {
-    int res = -1, year = 0, *mon, day = 0, hour = 0, min = 0, minw = 0, hourw = 0, dayw = 0, monw = 0, yearw = 0;
+    int res = -1, year = 0, *mon, day = 0, hour = 0, min = 0, minw = 0, hourw = 0, dayw = 0, monw = 0, yearw = 0, monthnum;
     char* now;
     now = returntimetomin();
-    
+
     //연산
     //분
     if(Stringtoint(substring(starttime, MININTIME, TIMESECTORLEN)) > Stringtoint(substring(now, MININTIME,TIMESECTORLEN))) {
@@ -145,7 +178,7 @@ int checkParkingdays(char *starttime) {
         }
     }
     else {
-        int monthnum, l;
+        int l;
         monthnum = (Stringtoint(substring(now, MONINTIME, TIMESECTORLEN)) + monw) - Stringtoint(substring(starttime, MONINTIME, TIMESECTORLEN));
         mon = (int*)malloc(sizeof(int) * monthnum);
         for(int i = 0; i < monthnum; i++) {
@@ -154,7 +187,6 @@ int checkParkingdays(char *starttime) {
             mon[i] = l;
         }
     }
-    
     //년
     if(Stringtoint(substring(starttime, YEARINTIME, TIMESECTORLEN)) > Stringtoint(substring(now, YEARINTIME, TIMESECTORLEN)) + yearw) {
         printf("잘못된 입력입니다\n");
@@ -163,6 +195,14 @@ int checkParkingdays(char *starttime) {
     else {
         year = (Stringtoint(substring(now, YEARINTIME, TIMESECTORLEN)) + yearw) - Stringtoint(substring(starttime, YEARINTIME, TIMESECTORLEN));
     }
+
+    res += year * 365 * 24 * 60;
+    for(int i = 0; i < monthnum; i++) {
+        res += checkMaxDayofMonth(2023, mon[i]);
+    }
+    res += day * 24 * 60;
+    res += hour * 60;
+    res += min;
     
     return res;
 }
@@ -293,8 +333,6 @@ char* makeMessagefromData(void* data, int datatype, int count) {
     if(datatype == DT_SALEDATA) {
 
     }
-    
-
     return res;
 }
 
@@ -313,6 +351,21 @@ void requestgivethedata(char* message, int page) {
     dataptr = readFile(PARKINGCARINFOROUTE, page, PAGEDATACOUNT, &count);
     message = makeMessagefromData(dataptr, DT_PARKCAR, count);
     sendthedata(message, strlen(message));
+}
+
+void requestCalculatetheCar(char * message) {
+    Parkcar data;
+    int bill;
+    data = SearchtheCar(substring(message, 1, CARNUMBERSIZE));
+    bill = checkBill(data);
+    makeIntotoString(bill);
+    strcpy(message, makeIntotoString(bill));
+    sendthedata(message, strlen(message));
+}
+
+void requestExchangetheCar(char *message) {
+    SearchtheCar(substring(message, 1, CARNUMBERSIZE));
+    
 }
 
 void server_console() {

@@ -55,7 +55,6 @@ void init_socket() {
         error_handling("listen() error");
 
     clnt_adr_sz = sizeof(clnt_adr);
-
     FD_ZERO(&reads);
     //데이터의 수신여부를 관찰하는 관찰대상에 서버 소켓 포함
     FD_SET(serv_sock, &reads);
@@ -79,6 +78,7 @@ void ListenFromtheClient() {
          if(FD_ISSET(i, &cpy_reads)) {
             if(i == serv_sock) {
                clnt_adr_sz = sizeof(clnt_adr);
+               
                clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
                FD_SET(clnt_sock, &reads);
                if(fd_max < clnt_sock) fd_max = clnt_sock;
@@ -86,12 +86,22 @@ void ListenFromtheClient() {
             }
             else {
                str_len = read(i, message, BUF_SIZE);
+               printf("get: %s\n", message);
                if(str_len == 0) {
                   FD_CLR(i, &reads);
                   close(i);
                   printf("closed client: %d \n", i);
                }
                else {
+                  if(message[0] == GETPARKCARLISTOFPAGE) {
+                     requestgivethedata(message, Stringtoint(substring(message, 1, 2)));
+                  }
+                  else if(message[0] == SAVEONEPARKCARDATA) {
+                     requestsavetheCardata(message);
+                  }
+                  else if (message[0]  == EXCHANGETHECARDATA) {
+                     requestExchangetheCar(message);
+                  }
                   
                }
             }
@@ -104,6 +114,7 @@ void ListenFromtheClient() {
 int sendthedata(char* data, int datasize) {
     int chk_write;
     data[datasize] = '\0';
+    printf("message to Client: %s", data);
     chk_write = write(clnt_sock, data, datasize);
     return chk_write;
     

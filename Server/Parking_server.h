@@ -12,7 +12,7 @@
 //데이터 크기
 #define PARKCARRECORDSIZE 32    //주차차량 레코드 크기
 
-#define CARNUMBERSIZE 10        //차량번호크기
+#define CARNUMBERSIZE 11        //차량번호크기
 #define PHONENUMBERSIZE 14      //전화번호크기
 #define INTIMESIZE 11           //입차시간크기
 #define SIXDAYSIZE 7            //만료날짜크기
@@ -29,13 +29,15 @@
 //기능 번호
 #define GETALLPARKINGPLACECOUNT '0'     //주차장 총 주차대수 가져오기
 #define SAVEONEPARKCARDATA '1'          //1개의 차량 데이터 저장(입차)
-#define CALCULATEONEPARKCARDATA '2'     //1개의 차량 데이터 정산(출차)
+#define CALCULATETHECARDATA '2'     //1개의 차량 데이터 요금 확인
 #define GETPARKCARLISTOFPAGE '3'        //선택 페이지 차량 데이터 가져오기
 #define GETNOWPARKINGCARCOUNT '4'       //현재 주차중인 차량 대수 가져오기
 #define SAVEONECOMMUTERCAR '5'          //정기권 차량 등록
 #define ADDONECOMMUTERCARTIME '6'       //정기권 차량 기간 연장
 #define UPDATECOMMUTERCARNUMBER '7'     //정기권 차량 차량번호 수정
 #define DELETEONECOMMUTERCAR '8'        //정기권 차량 삭제
+
+#define EXCHANGETHECARDATA 'a'      //차량 Carinfo에서 삭제하고 Sale데이터로 넘기기
 
 //데이터 타입 코드
 #define DT_PARKCAR 3
@@ -44,14 +46,12 @@
 #define DT_SALEDATA 6
 
 //파일 경로
-#define PARKINGCARINFOROUTE "Parkinginfo.bin"
-#define COMMUTERCARROUTE "CommuterCar.bin"
-#define COMMUTERINFOROUTE "Commuterinfo.txt"
-#define SALESROUTE "Sales.txt"
-#define FEEOPTIONROUTE "Feeoptioninfo.txt"
-#define PLACEINFOROUTE "Placeinfo.txt"
-
-
+#define PARKINGCARINFOROUTE "Datas/Parkinginfo.bin"
+#define COMMUTERCARROUTE "Datas/CommuterCar.bin"
+#define COMMUTERINFOROUTE "Datas/Commuterinfo.txt"
+#define SALESROUTE "Datas/Sales.txt"
+#define FEEOPTIONROUTE "Datas/Feeoptioninfo.txt"
+#define PLACEINFOROUTE "Datas/Placeinfo.txt"
 
 void error_handling(char *message);
 
@@ -81,7 +81,7 @@ typedef struct _salesdata {
 } Salesdata;
 
 typedef struct _parkingplaceSetting {
-    int MaxCarSize;
+    int MaxCarSize; //최대 주차가능 차량
     int FirstPee;
     int FirstPeeTime;
     int NextPee;
@@ -94,22 +94,37 @@ typedef struct _parkingplaceSetting {
     int PeeOfDay;
 } ParkingplaceSetting;
 
+typedef struct _time {
+    int year;
+    int month;
+    int mon[12];
+    int day;
+    int hour;
+    int min;
+} Time;
+
 //Programinside
 int Stringtoint(char *str);
 char* substring(char *str, int start, int length);
+void getSetting(void);  //주차장 설정 불러오기
+void saveSetting(void); //주차장 설정 저장하기
 void requestsavetheCardata(char* message);
 void requestchangethedata(int *clnt_sock, char* message);
-void requestExchangetheCar(char* message);
+void requestExchangetheCar(char *message);
 void requestgivethedata(char* message, int page);
 
 //Network
-void init_socket(); //소켓 초기화
-void ListenFromtheClient(); //소켓 듣기 상태
+void init_socket(void); //소켓 초기화
+void ListenFromtheClient(void); //소켓 듣기 상태
 int sendthedata(char* data, int datasize); //클라이언트에 데이터 보내기
 
 
 //FileInOut
-void getSetting();  //주차장 설정 불러오기
 void* readFile(char* filename, int startline, int count, int *n); //파일 읽기
+void getPlaceinfo(ParkingplaceSetting *Setting); //세팅 읽기
+void getFeeoptioninfo(ParkingplaceSetting *Setting); //세팅 읽기
+void savePlaceinfo(ParkingplaceSetting Setting); //세팅 저장
+void seveFeeoptioninfo(ParkingplaceSetting Setting); //세팅 저장
+Parkcar SearchtheCar(char* number); //차량 검색
 
 #endif

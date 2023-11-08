@@ -1,14 +1,6 @@
 
 #define MAX_CHAR_PER_LINE 1024
 
-#define PARKINGCARINFOROUTE "Parkinginfo.bin"
-#define COMMUTERCARROUTE "CommuterCar.bin"
-#define COMMUTERINFOROUTE "Commuterinfo.txt"
-#define SALESROUTE "Sales.txt"
-#define FEEOPTIONROUTE "Feeoptioninfo.txt"
-#define PLACEINFOROUTE "Placeinfo.txt"
-
-
 #define PARKINGCARINFORECORDSIZE 32
 #define COMMUTERCARRECORDSIZE 15
 
@@ -16,8 +8,6 @@
 #include "parson.h"
 #include <unistd.h>
 #include <stdarg.h>
-
-ParkingplaceSetting Setting;
 
 typedef Parkcar Element;
 typedef struct LinkedNode {
@@ -41,11 +31,12 @@ void enqueue(Element e);    //데이터 삽입
 Element dequeue(void);  //데이터 가져오기(큐에서 삭제)
 Element peek(void);     //데이터 가져오기(큐에서 삭제X)
 void destroy_queue(void);   //큐 초기화
-void print_queue(char *msg);
+void print_queue(char *msg);    
 
 void* readFile(char* filename, int startline, int count, int *n);
 void* readFiletail(char* filename, FILE *fp, int *count, void* res, int *n);
 void savethecar(Parkcar newone);
+Parkcar SearchtheCar(char* number);
 void readParkinginfo(void);
 
 void init_Parkingcarinfo(void) {
@@ -84,6 +75,33 @@ void savethecar(Parkcar newone) {
         fprintf(fp, "\n");
     }
     fclose(fp);
+}
+
+Parkcar SearchtheCar(char* number) {
+    FILE *fp;
+    Parkcar* data;
+    Parkcar res;
+    int i, line;
+    char Carnumber[CARNUMBERSIZE];
+    if(access(PARKINGCARINFOROUTE, F_OK) != -1) {
+        while(!feof(fp)) {
+            fp = fopen(PARKINGCARINFOROUTE, "r");
+            for(i = 0; i < CARNUMBERSIZE - 1; i++) {
+                Carnumber[i] = getc(fp);
+            }
+            Carnumber[i] = '\0';
+            if(strcmp(Carnumber, number) == 0) {
+                int n = 0;
+                fclose(fp);
+                data = (Parkcar*)readFile(PARKINGCARINFOROUTE, line, 1, &n);
+                res = *data;
+                free(data);
+                return res;
+            }
+        }
+
+        fclose(fp);
+    }
 }
 
 void* readFiletail(char* filename, FILE *fp, int *count, void* res, int *n) {
@@ -132,7 +150,7 @@ void* readFile(char* filename, int startline, int count, int *n) {
     void* res;
 
     if(access(filename, F_OK) == -1) return NULL;
-    fp = fopen(filename, "r");
+    fp = fopen(filename, "rb");
 
     if(strcmp(filename, PARKINGCARINFOROUTE) == 0) {
         fseek(fp, SEEK_SET, PARKINGCARINFORECORDSIZE * startline);
@@ -142,6 +160,9 @@ void* readFile(char* filename, int startline, int count, int *n) {
                 strcpy(((Parkcar*)res)[i].carnumber, substring(line, 0, CARNUMBERSIZE - 1));
                 strcpy(((Parkcar*)res)[i].phonenumber, substring(line, CARNUMBERSIZE - 1, PHONENUMBERSIZE - 1));
                 strcpy(((Parkcar*)res)[i].intime, substring(line, (CARNUMBERSIZE - 1) + (PHONENUMBERSIZE - 1), INTIMESIZE - 1));
+                printf("carnumber: %s\n", ((Parkcar*)res)[i].carnumber);
+                printf("phonenumver: %s\n", ((Parkcar*)res)[i].phonenumber);
+                printf("intime: %s\n\n", ((Parkcar*)res)[i].intime);
                 ++i;
             }
             *n = i;
@@ -227,17 +248,57 @@ void print_queue(char *msg)
     printf("\n");
 }
 
-void getPlaceinfo() {
-    
+void getPlaceinfo(ParkingplaceSetting *Setting) {
+    FILE *fp;
+    char line[MAX_CHAR_PER_LINE];
+    fp = fopen(PLACEINFOROUTE, "r");
+    fgets(line, MAX_CHAR_PER_LINE, fp);
+    printf("%s\n", line);
+    Setting -> MaxCarSize = Stringtoint(substring(line, 0, 4));
+    Setting -> FirstPee = Stringtoint(substring(line, 3, 5));
+    Setting -> FirstPeeTime = Stringtoint(substring(line, 9, 3));
+    Setting -> NextPee = Stringtoint(substring(line, 12, 5));
+    Setting -> NextPeeTime = Stringtoint(substring(line, 17, 3));
+    fclose(fp);
 }
 
-void getFeeoptioninfo() {
-
+void getFeeoptioninfo(ParkingplaceSetting *Setting) {
+    FILE *fp;
+    char line[MAX_CHAR_PER_LINE];
+    fp = fopen(FEEOPTIONROUTE, "r");
+    fgets(line, MAX_CHAR_PER_LINE, fp);
+    printf("%s\n", line);
+    Setting -> GetWeekendPee = Stringtoint(substring(line, 0, 1));
+    Setting -> GetBigCarPeePercent = Stringtoint(substring(line, 1, 3));
+    Setting -> ChangePlusMoney = Stringtoint(substring(line, 4, 5));
+    Setting -> PlusMoneyTime = Stringtoint(substring(line, 9, 3));
+    Setting -> PlusMoneyPlus = Stringtoint(substring(line, 12, 3));
+    printf("%s\n", (substring(line, 15, 5)));
+    Setting -> PeeOfDay = Stringtoint (substring(line, 15, 5));
+    fclose(fp);
 }
 
-void getSetting() {
-    getPlaceinfo();
-    getFeeoptioninfo();
+void savePlaceinfo(ParkingplaceSetting Setting) {
+    FILE *fp;
+    fp = fopen(PLACEINFOROUTE, "w");
+    fprintf(fp, "%d", Setting.MaxCarSize);
+    fprintf(fp, "%d", Setting.FirstPee);
+    fprintf(fp, "%d", Setting.FirstPeeTime);
+    fprintf(fp, "%d", Setting.NextPee);
+    fprintf(fp, "%d", Setting.NextPeeTime);
+    fclose(fp);
+}
+
+void seveFeeoptioninfo(ParkingplaceSetting Setting) {
+    FILE *fp;
+    fp = fopen(FEEOPTIONROUTE, "w");
+    fprintf(fp, "%d", Setting.GetWeekendPee);
+    fprintf(fp, "%d", Setting.GetBigCarPeePercent);
+    fprintf(fp, "%d", Setting.ChangePlusMoney);
+    fprintf(fp, "%d", Setting.PlusMoneyTime);
+    fprintf(fp, "%d", Setting.PlusMoneyPlus);
+    fprintf(fp, "%d", Setting.PeeOfDay);
+    fclose(fp);
 }
 
 /*
